@@ -34,7 +34,7 @@
 #import "YZDisplayViewController.h"
 
 // 导航条高度
-static CGFloat const YZNavBarH = 64;
+static CGFloat const YZNavBarH = 44;
 
 // 标题滚动视图的高度
 static CGFloat const YZTitleScrollViewH = 44;

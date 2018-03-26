@@ -12,47 +12,33 @@
 #import "UIView+Frame.h"
 #import "YZFlowLayout.h"
 
-static NSString * const ID = @"CONTENTCELL";
+static NSString * const CellIndentifier = @"CellIndentifier";
 
-@interface YZDisplayViewController ()<UICollectionViewDataSource,UICollectionViewDelegate>
-{
-    UIColor *_norColor;
-    UIColor *_selColor;
-}
-/**
- *  下标宽度是否等于标题宽度
- */
+@interface YZDisplayViewController () <UICollectionViewDataSource, UICollectionViewDelegate>
+//{
+//    UIColor *_norColor;
+//    UIColor *_selColor;
+//}
+
+/** 下标宽度是否等于标题宽度 */
 @property (nonatomic, assign) BOOL isUnderLineEqualTitleWidth;
-/**
- 标题滚动视图背景颜色
- */
+
+/** 标题滚动视图背景颜色 */
 @property (nonatomic, strong) UIColor *titleScrollViewColor;
 
-
-/**
- 标题高度
- */
+/** 标题高度 */
 @property (nonatomic, assign) CGFloat titleHeight;
 
-/**
- 标题宽度
- */
+/** 标题宽度 */
 @property (nonatomic, assign) CGFloat titleWidth;
 
-
-/**
- 正常标题颜色
- */
+/** 正常标题颜色 */
 @property (nonatomic, strong) UIColor *norColor;
 
-/**
- 选中标题颜色
- */
+/** 选中标题颜色 */
 @property (nonatomic, strong) UIColor *selColor;
 
-/**
- 标题字体
- */
+/** 标题字体 */
 @property (nonatomic, strong) UIFont *titleFont;
 
 /** 整体内容View 包含标题好内容滚动视图 */
@@ -64,30 +50,25 @@ static NSString * const ID = @"CONTENTCELL";
 /** 内容滚动视图 */
 @property (nonatomic, weak) UICollectionView *contentScrollView;
 
-/** 所以标题数组 */
+/** 所有标题数组 */
 @property (nonatomic, strong) NSMutableArray *titleLabels;
 
-/** 所以标题宽度数组 */
+/** 所有标题宽度数组 */
 @property (nonatomic, strong) NSMutableArray *titleWidths;
 
 /** 下标视图 */
 @property (nonatomic, weak) UIView *underLine;
 
-/**
- 是否需要下标
- */
+/** 是否需要下标 */
 @property (nonatomic, assign) BOOL isShowUnderLine;
-/**
- 字体是否渐变
- */
+
+/** 字体是否渐变 */
 @property (nonatomic, assign) BOOL isShowTitleGradient;
-/**
- 字体放大
- */
+
+/** 字体放大 */
 @property (nonatomic, assign) BOOL isShowTitleScale;
-/**
- 是否显示遮盖
- */
+
+/** 是否显示遮盖 */
 @property (nonatomic, assign) BOOL isShowTitleCover;
 
 /** 标题遮盖视图 */
@@ -110,56 +91,37 @@ static NSString * const ID = @"CONTENTCELL";
 
 /** 计算上一次选中角标 */
 @property (nonatomic, assign) NSInteger selIndex;
-/**
- 颜色渐变样式
- */
+
+/** 颜色渐变样式 */
 @property (nonatomic, assign) YZTitleColorGradientStyle titleColorGradientStyle;
 
-/**
- 字体缩放比例
- */
+/** 字体缩放比例 */
 @property (nonatomic, assign) CGFloat titleScale;
-/**
- 是否延迟滚动下标
- */
+
+/** 是否延迟滚动下标 */
 @property (nonatomic, assign) BOOL isDelayScroll;
-/**
- 遮盖颜色
- */
+
+/** 遮盖颜色 */
 @property (nonatomic, strong) UIColor *coverColor;
 
-/**
- 遮盖圆角半径
- */
+/** 遮盖圆角半径 */
 @property (nonatomic, assign) CGFloat coverCornerRadius;
 
-/**
- 下标颜色
- */
+/** 下标颜色 */
 @property (nonatomic, strong) UIColor *underLineColor;
 
-/**
- 下标高度
- */
+/** 下标高度 */
 @property (nonatomic, assign) CGFloat underLineH;
 
 
-/**
- 开始颜色,取值范围0~1
- */
+/** 开始颜色,取值范围0~1 */
 @property (nonatomic, assign) CGFloat startR;
-
 @property (nonatomic, assign) CGFloat startG;
-
 @property (nonatomic, assign) CGFloat startB;
 
-/**
- 完成颜色,取值范围0~1
- */
+/** 完成颜色,取值范围0~1 */
 @property (nonatomic, assign) CGFloat endR;
-
 @property (nonatomic, assign) CGFloat endG;
-
 @property (nonatomic, assign) CGFloat endB;
 
 @end
@@ -177,20 +139,23 @@ static NSString * const ID = @"CONTENTCELL";
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     [self initial];
     
 }
 
-- (void)initial
-{
+- (void)initial {
     // 初始化标题高度
     _titleHeight = YZTitleScrollViewH;
+    
+    _norColor = [UIColor blackColor];
+    _selColor = [UIColor redColor];
+
     
     self.automaticallyAdjustsScrollViewInsets = NO;
 }
 
 #pragma mark - 懒加载
-
 - (UIFont *)titleFont
 {
     if (_titleFont == nil) {
@@ -206,20 +171,6 @@ static NSString * const ID = @"CONTENTCELL";
         _titleWidths = [NSMutableArray array];
     }
     return _titleWidths;
-}
-
-- (UIColor *)norColor
-{
-    if (_norColor == nil) self.norColor = [UIColor blackColor];
-    
-    return _norColor;
-}
-
-- (UIColor *)selColor
-{
-    if (_selColor == nil) self.selColor = [UIColor redColor];
-    
-    return _selColor;
 }
 
 - (UIView *)coverView
@@ -251,7 +202,7 @@ static NSString * const ID = @"CONTENTCELL";
         _underLine = underLineView;
         
     }
-    return _isShowUnderLine?_underLine : nil;
+    return _isShowUnderLine ? _underLine : nil;
 }
 
 - (NSMutableArray *)titleLabels
@@ -269,6 +220,7 @@ static NSString * const ID = @"CONTENTCELL";
     if (_titleScrollView == nil) {
         
         UIScrollView *titleScrollView = [[UIScrollView alloc] init];
+        
         titleScrollView.scrollsToTop = NO;
         titleScrollView.backgroundColor = _titleScrollViewColor?_titleScrollViewColor:[UIColor colorWithWhite:1 alpha:0.7];
         
@@ -298,7 +250,7 @@ static NSString * const ID = @"CONTENTCELL";
         _contentScrollView.dataSource = self;
         _contentScrollView.scrollsToTop = NO;
         // 注册cell
-        [_contentScrollView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:ID];
+        [_contentScrollView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:CellIndentifier];
         
         _contentScrollView.backgroundColor = self.view.backgroundColor;
         [self.contentView insertSubview:contentScrollView belowSubview:self.titleScrollView];
@@ -323,6 +275,20 @@ static NSString * const ID = @"CONTENTCELL";
 }
 
 #pragma mark - 属性setter方法
+- (void)setNorColor:(UIColor *)norColor
+{
+    _norColor = norColor;
+    
+    [_norColor getRed:&_startR green:&_startG blue:&_startB alpha:nil];
+}
+
+- (void)setSelColor:(UIColor *)selColor
+{
+    _selColor = selColor;
+    
+    [_selColor getRed:&_endR green:&_endG blue:&_endB alpha:nil];
+}
+
 - (void)setIsShowTitleScale:(BOOL)isShowTitleScale
 {
     if (_isShowUnderLine) {
@@ -332,6 +298,12 @@ static NSString * const ID = @"CONTENTCELL";
     }
     
     _isShowTitleScale = isShowTitleScale;
+}
+
+- (void)setTitleScale:(CGFloat)titleScale {
+    self.isShowTitleScale = YES;
+    
+    _titleScale = titleScale;
 }
 
 - (void)setIsShowUnderLine:(BOOL)isShowUnderLine
@@ -410,12 +382,8 @@ static NSString * const ID = @"CONTENTCELL";
 // 一次性设置所有字体缩放属性
 - (void)setUpTitleScale:(void(^)(CGFloat *titleScale))titleScaleBlock
 {
-    _isShowTitleScale = YES;
-    
-    if (_isShowUnderLine) {
-        @throw [NSException exceptionWithName:@"YZ_Error" reason:@"当前框架下标和字体缩放不能一起用" userInfo:nil];
-    }
-    
+    self.isShowTitleScale = YES;
+
     if (titleScaleBlock) {
         titleScaleBlock(&_titleScale);
     }
@@ -474,16 +442,14 @@ static NSString * const ID = @"CONTENTCELL";
     [super viewDidLayoutSubviews];
     
     if (_isInitial == NO) {
-        self.selectIndex = self.selectIndex;
-        
+        self.selectIndex = _selectIndex;
+
         _isInitial = YES;
         
         CGFloat statusH = [UIApplication sharedApplication].statusBarFrame.size.height;
         
-        CGFloat titleY = self.navigationController.navigationBarHidden == NO ?YZNavBarH:statusH;
-        
-        
-        
+        CGFloat titleY = self.navigationController.navigationBarHidden == NO ?(YZNavBarH + 44.0):statusH;
+
         // 是否占据全屏
         if (_isfullScreen) {
             
@@ -529,12 +495,8 @@ static NSString * const ID = @"CONTENTCELL";
             [self setUpTitleWidth];
         }
         
-        
         [self setUpAllTitle];
-        
     }
-    
-    
 }
 
 #pragma mark - 添加标题方法
@@ -898,20 +860,22 @@ static NSString * const ID = @"CONTENTCELL";
     [self setLabelTitleCenter:label];
     
     // 设置下标的位置
-    if (_isShowUnderLine) {
-        [self setUpUnderLine:label];
-    }
+    [self setUpUnderLine:label];
+   
     
     // 设置cover
-    if (_isShowTitleCover) {
-        [self setUpCoverView:label];
-    }
+    [self setUpCoverView:label];
+    
     
 }
 
 // 设置蒙版
 - (void)setUpCoverView:(UILabel *)label
 {
+    if (!_isShowTitleCover) {
+        return;
+    }
+    
     // 获取文字尺寸
     CGRect titleBounds = [label.text boundingRectWithSize:CGSizeMake(MAXFLOAT, 0) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:self.titleFont} context:nil];
     
@@ -945,6 +909,10 @@ static NSString * const ID = @"CONTENTCELL";
 // 设置下标的位置
 - (void)setUpUnderLine:(UILabel *)label
 {
+    if (!_isShowUnderLine) {
+        return;
+    }
+    
     // 获取文字尺寸
     CGRect titleBounds = [label.text boundingRectWithSize:CGSizeMake(MAXFLOAT, 0) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:self.titleFont} context:nil];
     
@@ -1049,7 +1017,7 @@ static NSString * const ID = @"CONTENTCELL";
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    UICollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:ID forIndexPath:indexPath];
+    UICollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:CellIndentifier forIndexPath:indexPath];
     
     // 移除之前的子控件
     [cell.contentView.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
@@ -1059,12 +1027,17 @@ static NSString * const ID = @"CONTENTCELL";
     
     vc.view.frame = CGRectMake(0, 0, self.contentScrollView.yz_width, self.contentScrollView.yz_height);
     
-    CGFloat bottom = self.tabBarController == nil?0:49;
-    CGFloat top = _isfullScreen?CGRectGetMaxY(self.titleScrollView.frame):0;
-    if ([vc isKindOfClass:[UITableViewController class]]) {
-        UITableViewController *tableViewVc = (UITableViewController *)vc;
-        tableViewVc.tableView.contentInset = UIEdgeInsetsMake(top, 0, bottom, 0);
-    }
+//    CGFloat bottom = self.tabBarController == nil?0:49;
+//    CGFloat top = _isfullScreen?CGRectGetMaxY(self.titleScrollView.frame):0;
+//    if ([vc isKindOfClass:[UITableViewController class]]) {
+//        UITableViewController *tableViewVc = (UITableViewController *)vc;
+//        tableViewVc.tableView.contentInset = UIEdgeInsetsMake(top, 0, bottom, 0);
+//        if (@available(iOS 11.0, *)) {
+//            tableViewVc.tableView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+//        } else {
+//            // Fallback on earlier versions
+//        }
+//    }
     
     [cell.contentView addSubview:vc.view];
     
@@ -1168,70 +1141,5 @@ static NSString * const ID = @"CONTENTCELL";
     // 记录上一次的偏移量
     _lastOffsetX = offsetX;
 }
-
-#pragma mark - 颜色操作
-
-- (void)setNorColor:(UIColor *)norColor
-{
-    _norColor = norColor;
-    [self setupStartColor:norColor];
-    
-}
-
-- (void)setSelColor:(UIColor *)selColor
-{
-    _selColor = selColor;
-    [self setupEndColor:selColor];
-}
-
-- (void)setupStartColor:(UIColor *)color
-{
-    CGFloat components[3];
-    
-    [self getRGBComponents:components forColor:color];
-    
-    _startR = components[0];
-    _startG = components[1];
-    _startB = components[2];
-}
-
-- (void)setupEndColor:(UIColor *)color
-{
-    CGFloat components[3];
-    
-    [self getRGBComponents:components forColor:color];
-    
-    _endR = components[0];
-    _endG = components[1];
-    _endB = components[2];
-}
-
-
-
-/**
- *  指定颜色，获取颜色的RGB值
- *
- *  @param components RGB数组
- *  @param color      颜色
- */
-- (void)getRGBComponents:(CGFloat [3])components forColor:(UIColor *)color {
-    CGColorSpaceRef rgbColorSpace = CGColorSpaceCreateDeviceRGB();
-    unsigned char resultingPixel[4];
-    CGContextRef context = CGBitmapContextCreate(&resultingPixel,
-                                                 1,
-                                                 1,
-                                                 8,
-                                                 4,
-                                                 rgbColorSpace,
-                                                 1);
-    CGContextSetFillColorWithColor(context, [color CGColor]);
-    CGContextFillRect(context, CGRectMake(0, 0, 1, 1));
-    CGContextRelease(context);
-    CGColorSpaceRelease(rgbColorSpace);
-    for (int component = 0; component < 3; component++) {
-        components[component] = resultingPixel[component] / 255.0f;
-    }
-}
-
 
 @end

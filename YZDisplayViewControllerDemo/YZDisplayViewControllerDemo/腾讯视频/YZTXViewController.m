@@ -18,7 +18,9 @@
     
     self.title = @"腾讯视频";
     
-    CGFloat y = self.navigationController?64:0;
+    CGFloat statusH = [UIApplication sharedApplication].statusBarFrame.size.height;
+    
+    CGFloat y = self.navigationController?(statusH + 44):0;
     CGFloat screenW = [UIScreen mainScreen].bounds.size.width;
     CGFloat screenH = [UIScreen mainScreen].bounds.size.height;
     
