@@ -33,9 +33,12 @@
         
     }];
     
-    [self setUpUnderLineEffect:^(BOOL *isUnderLineDelayScroll, CGFloat *underLineH, UIColor *__autoreleasing *underLineColor,BOOL *isUnderLineEqualTitleWidth) {
+//    self.underLineWidth = 20;
+    [self setUpUnderLineEffect:^(BOOL *isUnderLineDelayScroll, CGFloat *underLineH,CGFloat *underLineWidth, UIColor *__autoreleasing *underLineColor,BOOL *isUnderLineEqualTitleWidth) {
 //        *isUnderLineDelayScroll = YES;
-        *isUnderLineEqualTitleWidth = YES;
+//        *isUnderLineEqualTitleWidth = NO;
+        
+        *underLineWidth = 20;
     }];
         
     // 字体缩放

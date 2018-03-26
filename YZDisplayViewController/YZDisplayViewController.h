@@ -52,7 +52,9 @@ typedef enum : NSUInteger {
 
 
 /***********************************【下标样式】***********************************/
-- (void)setUpUnderLineEffect:(void(^)(BOOL *isUnderLineDelayScroll,CGFloat *underLineH,UIColor **underLineColor, BOOL *isUnderLineEqualTitleWidth))underLineBlock;
+- (void)setUpUnderLineEffect:(void(^)(BOOL *isUnderLineDelayScroll,CGFloat *underLineH,CGFloat *underLineWidth,UIColor **underLineColor, BOOL *isUnderLineEqualTitleWidth))underLineBlock;
+
+@property (nonatomic, assign) CGFloat underLineWidth;
 
 
 /**********************************【字体缩放】************************************/

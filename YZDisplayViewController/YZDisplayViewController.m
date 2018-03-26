@@ -423,7 +423,7 @@ static NSString * const ID = @"CONTENTCELL";
 }
 
 // 一次性设置所有下标属性
-- (void)setUpUnderLineEffect:(void(^)(BOOL *isUnderLineDelayScroll,CGFloat *underLineH,UIColor **underLineColor,BOOL *isUnderLineEqualTitleWidth))underLineBlock
+- (void)setUpUnderLineEffect:(void(^)(BOOL *isUnderLineDelayScroll,CGFloat *underLineH,CGFloat *underLineWidth,UIColor **underLineColor,BOOL *isUnderLineEqualTitleWidth))underLineBlock
 {
     _isShowUnderLine = YES;
     
@@ -431,12 +431,12 @@ static NSString * const ID = @"CONTENTCELL";
         @throw [NSException exceptionWithName:@"YZ_Error" reason:@"当前框架下标和字体缩放不能一起用" userInfo:nil];
     }
     
-    UIColor *underLineColor;
+    UIColor *underLineColorTemp;
     
     if (underLineBlock) {
-        underLineBlock(&_isDelayScroll,&_underLineH,&underLineColor,&_isUnderLineEqualTitleWidth);
+        underLineBlock(&_isDelayScroll,&_underLineH,&_underLineWidth,&underLineColorTemp,&_isUnderLineEqualTitleWidth);
         
-        _underLineColor = underLineColor;
+        _underLineColor = underLineColorTemp;
     }
     
 }
@@ -763,11 +763,14 @@ static NSString * const ID = @"CONTENTCELL";
     
     // 计算当前下划线偏移量
     CGFloat underLineTransformX = offsetDelta * centerDelta / YZScreenW;
-    
-    // 宽度递增偏移量
-    CGFloat underLineWidth = offsetDelta * widthDelta / YZScreenW;
-    
-    self.underLine.yz_width += underLineWidth;
+ 
+    if (_underLineWidth > 0.0) {
+        
+    } else {
+        // 宽度递增偏移量
+        CGFloat underLineWidth = offsetDelta * widthDelta / YZScreenW;
+        self.underLine.yz_width += underLineWidth;
+    }
     self.underLine.yz_x += underLineTransformX;
     
 }
@@ -956,7 +959,11 @@ static NSString * const ID = @"CONTENTCELL";
         if (_isUnderLineEqualTitleWidth) {
             self.underLine.yz_width = titleBounds.size.width;
         } else {
-            self.underLine.yz_width = label.yz_width;
+            if (_underLineWidth > 0.0) {
+                self.underLine.yz_width = _underLineWidth;
+            } else {
+                self.underLine.yz_width = label.yz_width;
+            }
         }
         
         self.underLine.yz_centerX = label.yz_centerX;
@@ -968,7 +975,11 @@ static NSString * const ID = @"CONTENTCELL";
         if (_isUnderLineEqualTitleWidth) {
             self.underLine.yz_width = titleBounds.size.width;
         } else {
-            self.underLine.yz_width = label.yz_width;
+            if (_underLineWidth > 0.0) {
+                self.underLine.yz_width = _underLineWidth;
+            } else {
+                self.underLine.yz_width = label.yz_width;
+            }
         }
         self.underLine.yz_centerX = label.yz_centerX;
     }];
