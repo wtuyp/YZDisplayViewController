@@ -16,15 +16,6 @@ static NSString * const CellIndentifier = @"CellIndentifier";
 
 @interface YZDisplayViewController () <UICollectionViewDataSource, UICollectionViewDelegate>
 
-/** 整体内容View 包含标题和内容滚动视图 */
-@property (nonatomic, strong) UIView *contentView;
-
-/** 标题滚动视图 */
-@property (nonatomic, strong) UIScrollView *titleScrollView;
-
-/** 内容滚动视图 */
-@property (nonatomic, strong) UICollectionView *contentScrollView;
-
 /** 记录上一次内容滚动视图偏移量 */
 @property (nonatomic, assign) CGFloat lastOffsetX;
 
@@ -148,7 +139,6 @@ static NSString * const CellIndentifier = @"CellIndentifier";
     
     _norColor = [UIColor blackColor];
     _selColor = [UIColor redColor];
-
     
     self.automaticallyAdjustsScrollViewInsets = NO;
 }
@@ -157,11 +147,10 @@ static NSString * const CellIndentifier = @"CellIndentifier";
 - (UIFont *)titleFont
 {
     if (_titleFont == nil) {
-        _titleFont = YZTitleFont;
+        _titleFont = [UIFont systemFontOfSize:15];
     }
     return _titleFont;
 }
-
 
 - (NSMutableArray *)titleWidths
 {
@@ -171,13 +160,19 @@ static NSString * const CellIndentifier = @"CellIndentifier";
     return _titleWidths;
 }
 
+- (NSMutableArray *)titleLabels
+{
+    if (_titleLabels == nil) {
+        _titleLabels = [NSMutableArray array];
+    }
+    return _titleLabels;
+}
+
 - (UIView *)coverView
 {
     if (_coverView == nil) {
         _coverView = [[UIView alloc] init];
-        
         _coverView.backgroundColor = _coverColor ?: [UIColor lightGrayColor];
-        
         _coverView.layer.cornerRadius = _coverCornerRadius;
         
         [self.titleScrollView insertSubview:_coverView atIndex:0];
@@ -189,7 +184,6 @@ static NSString * const CellIndentifier = @"CellIndentifier";
 {
     if (_underLine == nil) {
         _underLine = [[UIView alloc] init];
-        
         _underLine.backgroundColor = _underLineColor ?: [UIColor redColor];
         
         [self.titleScrollView addSubview:_underLine];
@@ -197,21 +191,11 @@ static NSString * const CellIndentifier = @"CellIndentifier";
     return _isShowUnderLine ? _underLine : nil;
 }
 
-- (NSMutableArray *)titleLabels
-{
-    if (_titleLabels == nil) {
-        _titleLabels = [NSMutableArray array];
-    }
-    return _titleLabels;
-}
-
-
 // 懒加载标题滚动视图
 - (UIScrollView *)titleScrollView
 {
     if (_titleScrollView == nil) {
         _titleScrollView = [[UIScrollView alloc] init];
-        
         _titleScrollView.scrollsToTop = NO;
         _titleScrollView.backgroundColor = _titleScrollViewColor ?: [UIColor colorWithWhite:1 alpha:0.7];
         _titleScrollView.showsHorizontalScrollIndicator = NO;
@@ -225,20 +209,16 @@ static NSString * const CellIndentifier = @"CellIndentifier";
 - (UIScrollView *)contentScrollView
 {
     if (_contentScrollView == nil) {
-        
-        // 创建布局
         YZFlowLayout *layout = [[YZFlowLayout alloc] init];
         
         _contentScrollView = [[UICollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:layout];
-
-        // 设置内容滚动视图
         _contentScrollView.pagingEnabled = YES;
         _contentScrollView.showsHorizontalScrollIndicator = NO;
         _contentScrollView.bounces = NO;
         _contentScrollView.delegate = self;
         _contentScrollView.dataSource = self;
         _contentScrollView.scrollsToTop = NO;
-        // 注册cell
+
         [_contentScrollView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:CellIndentifier];
         
         _contentScrollView.backgroundColor = self.view.backgroundColor;
@@ -317,22 +297,14 @@ static NSString * const CellIndentifier = @"CellIndentifier";
     
 }
 
-// 设置整体内容的尺寸
-- (void)setUpContentViewFrame:(void (^)(UIView *))contentBlock
-{
-    if (contentBlock) {
-        contentBlock(self.contentView);
-    }
-}
-
 // 一次性设置所有颜色渐变属性
-- (void)setUpTitleGradient:(void(^)(YZTitleColorGradientStyle *titleColorGradientStyle,UIColor **norColor,UIColor **selColor))titleGradientBlock;
+- (void)setUpTitleGradient:(void (^)(YZTitleColorGradientStyle *titleColorGradientStyle, UIColor **norColor, UIColor **selColor))titleGradientBlock;
 {
     _isShowTitleGradient = YES;
     UIColor *norColor;
     UIColor *selColor;
     if (titleGradientBlock) {
-        titleGradientBlock(&_titleColorGradientStyle,&norColor,&selColor);
+        titleGradientBlock(&_titleColorGradientStyle, &norColor, &selColor);
         if (norColor) {
             self.norColor = norColor;
         }
@@ -340,27 +312,25 @@ static NSString * const CellIndentifier = @"CellIndentifier";
             self.selColor = selColor;
         }
     }
-    
+
     if (_titleColorGradientStyle == YZTitleColorGradientStyleFill && _titleWidth > 0) {
-        @throw [NSException exceptionWithName:@"YZ_ERROR" reason:@"标题颜色填充不需要设置标题宽度" userInfo:nil];
+        @throw [NSException exceptionWithName:@"YZDisplayViewControllerException" reason:@"标题颜色填充不需要设置标题宽度" userInfo:nil];
     }
 }
 
 // 一次性设置所有遮盖属性
 - (void)setUpCoverEffect:(void (^)(UIColor **, CGFloat *))coverEffectBlock
 {
-    UIColor *color;
-    
     _isShowTitleCover = YES;
     
     if (coverEffectBlock) {
-        
-        coverEffectBlock(&color,&_coverCornerRadius);
+        UIColor *color;
+
+        coverEffectBlock(&color, &_coverCornerRadius);
         
         if (color) {
             _coverColor = color;
         }
-        
     }
 }
 
@@ -372,36 +342,37 @@ static NSString * const CellIndentifier = @"CellIndentifier";
     if (titleScaleBlock) {
         titleScaleBlock(&_titleScale);
     }
-    
 }
 
 // 一次性设置所有下标属性
 - (void)setUpUnderLineEffect:(void(^)(BOOL *isUnderLineDelayScroll,CGFloat *underLineH,CGFloat *underLineWidth,UIColor **underLineColor,BOOL *isUnderLineEqualTitleWidth))underLineBlock
 {
-    _isShowUnderLine = YES;
-    
     if (_isShowTitleScale) {
-        @throw [NSException exceptionWithName:@"YZ_Error" reason:@"当前框架下标和字体缩放不能一起用" userInfo:nil];
+        @throw [NSException exceptionWithName:@"YZDisplayViewControllerException" reason:@"当前框架下标和字体缩放不能一起用" userInfo:nil];
     }
     
-    UIColor *underLineColorTemp;
+    _isShowUnderLine = YES;
+
     
     if (underLineBlock) {
-        underLineBlock(&_isDelayScroll,&_underLineHeight,&_underLineWidth,&underLineColorTemp,&_isUnderLineEqualTitleWidth);
+        UIColor *underLineColorTemp;
+        underLineBlock(&_isDelayScroll, &_underLineHeight, &_underLineWidth, &underLineColorTemp, &_isUnderLineEqualTitleWidth);
         
         _underLineColor = underLineColorTemp;
     }
-    
 }
 
 // 一次性设置所有标题属性
 - (void)setUpTitleEffect:(void (^)(UIColor **titleScrollViewColor, UIColor **norColor, UIColor **selColor, UIFont **titleFont, CGFloat *titleHeight, CGFloat *titleWidth))titleEffectBlock {
-    UIColor *titleScrollViewColor;
-    UIColor *norColor;
-    UIColor *selColor;
-    UIFont *titleFont;
+   
     if (titleEffectBlock) {
+        UIColor *titleScrollViewColor;
+        UIColor *norColor;
+        UIColor *selColor;
+        UIFont *titleFont;
+        
         titleEffectBlock(&titleScrollViewColor, &norColor, &selColor, &titleFont, &_titleHeight, &_titleWidth);
+        
         if (norColor) {
             self.norColor = norColor;
         }
@@ -411,11 +382,13 @@ static NSString * const CellIndentifier = @"CellIndentifier";
         if (titleScrollViewColor) {
             _titleScrollViewColor = titleScrollViewColor;
         }
-        _titleFont = titleFont;
+        if (titleFont) {
+            _titleFont = titleFont;
+        }
     }
     
     if (_titleColorGradientStyle == YZTitleColorGradientStyleFill && _titleWidth > 0) {
-        @throw [NSException exceptionWithName:@"YZ_ERROR" reason:@"标题颜色填充不需要设置标题宽度" userInfo:nil];
+        @throw [NSException exceptionWithName:@"YZDisplayViewControllerException" reason:@"标题颜色填充不需要设置标题宽度" userInfo:nil];
     }
 }
 
@@ -431,7 +404,7 @@ static NSString * const CellIndentifier = @"CellIndentifier";
         
         CGFloat statusH = [UIApplication sharedApplication].statusBarFrame.size.height;
         
-        CGFloat titleY = self.navigationController.navigationBarHidden == NO ? (YZNavBarH + 44.0) : statusH;
+        CGFloat titleY = !self.navigationController.isNavigationBarHidden ? (YZNavBarH + statusH) : statusH;
 
         // 是否占据全屏
         if (_isfullScreen) {
@@ -523,7 +496,7 @@ static NSString * const CellIndentifier = @"CellIndentifier";
     
     CGFloat titleMargin = (YZScreenW - totalWidth) / (count + 1);
     
-    _titleMargin = titleMargin < margin? margin: titleMargin;
+    _titleMargin = titleMargin < margin ? margin: titleMargin;
     
     self.titleScrollView.contentInset = UIEdgeInsetsMake(0, 0, 0, _titleMargin);
 }
@@ -542,27 +515,18 @@ static NSString * const CellIndentifier = @"CellIndentifier";
     CGFloat labelY = 0;
     
     for (int i = 0; i < count; i++) {
-        
         UIViewController *vc = self.childViewControllers[i];
         
         UILabel *label = [[YZDisplayTitleLabel alloc] init];
-        
         label.tag = i;
-        
-        // 设置按钮的文字颜色
         label.textColor = self.norColor;
-        
         label.font = self.titleFont;
-        
-        // 设置按钮标题
         label.text = vc.title;
         
         if (_titleColorGradientStyle == YZTitleColorGradientStyleFill || _titleWidth == 0) { // 填充样式才需要
             labelW = [self.titleWidths[i] floatValue];
             
-            // 设置按钮位置
             UILabel *lastLabel = [self.titleLabels lastObject];
-            
             labelX = _titleMargin + CGRectGetMaxX(lastLabel.frame);
         } else {
             labelX = i * labelW;
@@ -619,13 +583,11 @@ static NSString * const CellIndentifier = @"CellIndentifier";
         // 0.3 0 0
         // 1 -> 0.3
         // leftColor
-        UIColor *leftColor = [UIColor colorWithRed:_startR +  r * leftScale  green:_startG +  g * leftScale  blue:_startB +  b * leftScale alpha:1];
+        UIColor *leftColor = [UIColor colorWithRed:_startR +  r * leftScale  green:_startG +  g * leftScale  blue:_startB + b * leftScale alpha:1];
         
-        // 右边颜色
         rightLabel.textColor = rightColor;
-        
-        // 左边颜色
         leftLabel.textColor = leftColor;
+        
         return;
     }
     
@@ -643,9 +605,7 @@ static NSString * const CellIndentifier = @"CellIndentifier";
             leftLabel.textColor = self.selColor;
             leftLabel.fillColor = self.norColor;
             leftLabel.progress = rightSacle;
-            
         } else if(offsetDelta < 0){ // 往左边
-            
             rightLabel.textColor = self.norColor;
             rightLabel.fillColor = self.selColor;
             rightLabel.progress = rightSacle;
@@ -653,7 +613,6 @@ static NSString * const CellIndentifier = @"CellIndentifier";
             leftLabel.textColor = self.selColor;
             leftLabel.fillColor = self.norColor;
             leftLabel.progress = rightSacle;
-            
         }
     }
 }
@@ -670,7 +629,7 @@ static NSString * const CellIndentifier = @"CellIndentifier";
     
     CGFloat leftScale = 1 - rightSacle;
     
-    CGFloat scaleTransform = _titleScale?_titleScale:YZTitleTransformScale;
+    CGFloat scaleTransform = _titleScale ? _titleScale : YZTitleTransformScale;
     
     scaleTransform -= 1;
     
@@ -694,7 +653,9 @@ static NSString * const CellIndentifier = @"CellIndentifier";
 // 设置下标偏移
 - (void)setUpUnderLineOffset:(CGFloat)offsetX rightLabel:(UILabel *)rightLabel leftLabel:(UILabel *)leftLabel
 {
-    if (_isClickTitle) return;
+    if (_isClickTitle) {
+        return;
+    }
     
     // 获取两个标题中心点距离
     CGFloat centerDelta = rightLabel.yz_x - leftLabel.yz_x;
@@ -716,13 +677,14 @@ static NSString * const CellIndentifier = @"CellIndentifier";
         self.underLine.yz_width += underLineWidth;
     }
     self.underLine.yz_x += underLineTransformX;
-    
 }
 
 // 设置遮盖偏移
 - (void)setUpCoverOffset:(CGFloat)offsetX rightLabel:(UILabel *)rightLabel leftLabel:(UILabel *)leftLabel
 {
-    if (_isClickTitle) return;
+    if (_isClickTitle) {
+        return;
+    }
     
     // 获取两个标题中心点距离
     CGFloat centerDelta = rightLabel.yz_x - leftLabel.yz_x;
@@ -741,7 +703,6 @@ static NSString * const CellIndentifier = @"CellIndentifier";
     
     self.coverView.yz_width += coverWidth;
     self.coverView.yz_x += coverTransformX;
-    
 }
 
 #pragma mark - 标题点击处理
@@ -750,13 +711,11 @@ static NSString * const CellIndentifier = @"CellIndentifier";
     _selectIndex = selectIndex;
     
     if (self.titleLabels.count) {
-        
-        UILabel *label = self.titleLabels[selectIndex];
-        
         if (_selectIndex >= self.titleLabels.count) {
-            @throw [NSException exceptionWithName:@"YZ_ERROR" reason:@"选中控制器的角标越界" userInfo:nil];
+            @throw [NSException exceptionWithName:@"YZDisplayViewControllerException" reason:@"选中控制器的角标越界" userInfo:nil];
         }
         
+        UILabel *label = self.titleLabels[selectIndex];
         [self titleClick:[label.gestureRecognizers firstObject]];
     }
 }
@@ -812,26 +771,20 @@ static NSString * const CellIndentifier = @"CellIndentifier";
         if (label == labelView) continue;
         
         if (_isShowTitleGradient) {
-            
             labelView.transform = CGAffineTransformIdentity;
         }
         
         labelView.textColor = self.norColor;
         
         if (_isShowTitleGradient && _titleColorGradientStyle == YZTitleColorGradientStyleFill) {
-            
             labelView.fillColor = self.norColor;
-            
             labelView.progress = 1;
         }
-        
     }
     
     // 标题缩放
     if (_isShowTitleScale) {
-        
         CGFloat scaleTransform = _titleScale?_titleScale:YZTitleTransformScale;
-        
         label.transform = CGAffineTransformMakeScale(scaleTransform, scaleTransform);
     }
     
@@ -843,12 +796,9 @@ static NSString * const CellIndentifier = @"CellIndentifier";
     
     // 设置下标的位置
     [self setUpUnderLine:label];
-   
     
     // 设置cover
     [self setUpCoverView:label];
-    
-    
 }
 
 // 设置蒙版
@@ -880,12 +830,8 @@ static NSString * const CellIndentifier = @"CellIndentifier";
     // 点击时候需要动画
     [UIView animateWithDuration:0.25 animations:^{
         self.coverView.yz_width = coverW;
-        
         self.coverView.yz_x = label.yz_x - border;
     }];
-    
-    
-    
 }
 
 // 设置下标的位置
@@ -939,7 +885,6 @@ static NSString * const CellIndentifier = @"CellIndentifier";
 // 让选中的按钮居中显示
 - (void)setLabelTitleCenter:(UILabel *)label
 {
-    
     // 设置标题滚动区域的偏移量
     CGFloat offsetX = label.center.x - YZScreenW * 0.5;
     
@@ -960,7 +905,6 @@ static NSString * const CellIndentifier = @"CellIndentifier";
     
     // 滚动区域
     [self.titleScrollView setContentOffset:CGPointMake(offsetX, 0) animated:YES];
-    
 }
 
 #pragma mark - 刷新界面方法
@@ -968,7 +912,7 @@ static NSString * const CellIndentifier = @"CellIndentifier";
 - (void)refreshDisplay
 {
     if (self.childViewControllers.count == 0) {
-        @throw [NSException exceptionWithName:@"YZ_ERROR" reason:@"请确定添加了所有子控制器" userInfo:nil];
+        @throw [NSException exceptionWithName:@"YZDisplayViewControllerException" reason:@"请确定添加了所有子控制器" userInfo:nil];
     }
     
     // 清空之前所有标题

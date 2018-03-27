@@ -33,17 +33,7 @@
     [self setUpAllViewController];
     
     // 设置整体内容尺寸（包含标题滚动视图和底部内容滚动视图）
-    [self setUpContentViewFrame:^(UIView *contentView) {
-       
-        CGFloat contentX = 0;
-        
-        CGFloat contentY = CGRectGetMaxY(searchBar.frame);
-        
-        CGFloat contentH = screenH - contentY;
-
-        contentView.frame = CGRectMake(contentX, contentY, screenW, contentH);
-        
-    }];
+    self.contentView.frame = CGRectMake(0, CGRectGetMaxY(searchBar.frame), screenW, screenH - CGRectGetMaxY(searchBar.frame));
     
     /****** 标题渐变 ******/
     // 推荐方式(设置标题颜色渐变) // 默认RGB样式

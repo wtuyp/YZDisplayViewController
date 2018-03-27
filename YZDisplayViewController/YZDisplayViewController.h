@@ -16,6 +16,15 @@ typedef enum : NSUInteger {
 
 @interface YZDisplayViewController : UIViewController
 
+/** 整体内容View 包含标题和内容滚动视图 */
+@property (nonatomic, strong) UIView *contentView;
+
+/** 标题滚动视图 */
+@property (nonatomic, strong) UIScrollView *titleScrollView;
+
+/** 内容滚动视图 */
+@property (nonatomic, strong) UICollectionView *contentScrollView;
+
 /**************************************【内容】************************************/
 /**
     内容是否需要全屏展示
@@ -33,13 +42,6 @@ typedef enum : NSUInteger {
     标题是否需要跟随拖动保持居中
  */
 @property (nonatomic, assign) BOOL dragingFollow;
-
-/**
-    如果_isfullScreen = Yes，这个方法就不好使。
- 
-    设置整体内容的frame,包含（标题滚动视图和内容滚动视图）
- */
-- (void)setUpContentViewFrame:(void(^)(UIView *contentView))contentBlock;
 
 /**
  刷新标题和整个界面，在调用之前，必须先确定所有的子控制器。
