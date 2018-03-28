@@ -103,6 +103,8 @@ static NSString * const CellIndentifier = @"CellIndentifier";
 /** 下标高度 */
 @property (nonatomic, assign) CGFloat underLineHeight;
 
+/** 下标宽度 */
+@property (nonatomic, assign) CGFloat underLineWidth;
 
 /** 开始颜色,取值范围0~1 */
 @property (nonatomic, assign) CGFloat startR;
@@ -668,8 +670,6 @@ static NSString * const CellIndentifier = @"CellIndentifier";
     // 计算当前下划线偏移量
     CGFloat underLineTransformX = offsetDelta * centerDelta / YZScreenW;
     
-    
-    //TODO:  长度有点跳动的问题
     if (_underLineWidth > 0.0 || !_isUnderLineEqualTitleWidth) {
         self.underLine.yz_x += underLineTransformX;
     } else {
@@ -813,7 +813,10 @@ static NSString * const CellIndentifier = @"CellIndentifier";
     }
     
     // 获取文字尺寸
-    CGRect titleBounds = [label.text boundingRectWithSize:CGSizeMake(MAXFLOAT, 0) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:self.titleFont} context:nil];
+    CGRect titleBounds = [label.text boundingRectWithSize:CGSizeMake(MAXFLOAT, 0)
+                                                  options:NSStringDrawingUsesLineFragmentOrigin
+                                               attributes:@{NSFontAttributeName : self.titleFont}
+                                                  context:nil];
     
     CGFloat border = 5;
     CGFloat coverH = titleBounds.size.height + 2 * border;
@@ -967,11 +970,11 @@ static NSString * const CellIndentifier = @"CellIndentifier";
     
     NSInteger extre = offsetXInt % screenWInt;
     if (extre > YZScreenW * 0.5) {
+        _isAnimating = YES;
         // 往右边移动
         offsetX = offsetX + (YZScreenW - extre);
-        _isAnimating = YES;
         [self.contentScrollView setContentOffset:CGPointMake(offsetX, 0) animated:YES];
-    }else if (extre < YZScreenW * 0.5 && extre > 0){
+    } else if (extre < YZScreenW * 0.5 && extre > 0){
         _isAnimating = YES;
         // 往左边移动
         offsetX =  offsetX - extre;
