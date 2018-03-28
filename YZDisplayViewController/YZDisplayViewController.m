@@ -136,7 +136,6 @@ static NSString * const CellIndentifier = @"CellIndentifier";
 }
 
 - (void)initial {
-    // 初始化标题高度
     _titleHeight = 44.0;
     
     _norColor = [UIColor blackColor];
@@ -188,7 +187,7 @@ static NSString * const CellIndentifier = @"CellIndentifier";
         _underLine = [[UIView alloc] init];
         _underLine.backgroundColor = _underLineColor ?: [UIColor redColor];
         
-        [self.titleScrollView addSubview:_underLine];
+        [self.titleScrollView insertSubview:_underLine atIndex:0];
     }
     return _isShowUnderLine ? _underLine : nil;
 }
