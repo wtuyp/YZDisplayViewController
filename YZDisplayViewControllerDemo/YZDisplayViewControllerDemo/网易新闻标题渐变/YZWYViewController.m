@@ -36,7 +36,7 @@
 //    self.underLineWidth = 20;
     [self setUpUnderLineEffect:^(BOOL *isUnderLineDelayScroll, CGFloat *underLineH,CGFloat *underLineWidth, UIColor *__autoreleasing *underLineColor,BOOL *isUnderLineEqualTitleWidth) {
 //        *isUnderLineDelayScroll = YES;
-//        *isUnderLineEqualTitleWidth = NO;
+//        *isUnderLineEqualTitleWidth = YES;
         
         *underLineWidth = 20;
     }];

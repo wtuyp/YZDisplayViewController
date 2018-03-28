@@ -39,11 +39,6 @@ typedef enum : NSUInteger {
 @property (nonatomic, assign) NSInteger selectIndex;
 
 /**
-    标题是否需要跟随拖动保持居中
- */
-@property (nonatomic, assign) BOOL dragingFollow;
-
-/**
  刷新标题和整个界面，在调用之前，必须先确定所有的子控制器。
  */
 - (void)refreshDisplay;

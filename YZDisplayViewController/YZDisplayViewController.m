@@ -23,7 +23,7 @@ static NSString * const CellIndentifier = @"CellIndentifier";
 @property (nonatomic, assign) BOOL isClickTitle;
 
 /** 记录是否在动画 */
-@property (nonatomic, assign) BOOL isAniming;
+@property (nonatomic, assign) BOOL isAnimating;
 
 /* 是否初始化 */
 @property (nonatomic, assign) BOOL isInitial;
@@ -135,7 +135,7 @@ static NSString * const CellIndentifier = @"CellIndentifier";
 
 - (void)initial {
     // 初始化标题高度
-    _titleHeight = YZTitleScrollViewH;
+    _titleHeight = 44.0;
     
     _norColor = [UIColor blackColor];
     _selColor = [UIColor redColor];
@@ -380,7 +380,7 @@ static NSString * const CellIndentifier = @"CellIndentifier";
             self.selColor = selColor;
         }
         if (titleScrollViewColor) {
-            _titleScrollViewColor = titleScrollViewColor;
+            self.titleScrollViewColor = titleScrollViewColor;
         }
         if (titleFont) {
             _titleFont = titleFont;
@@ -657,26 +657,32 @@ static NSString * const CellIndentifier = @"CellIndentifier";
         return;
     }
     
-    // 获取两个标题中心点距离
-    CGFloat centerDelta = rightLabel.yz_x - leftLabel.yz_x;
     
-    // 标题宽度差值
-    CGFloat widthDelta = [self widthDeltaWithRightLabel:rightLabel leftLabel:leftLabel];
+ 
+    // 获取两个标题中心点距离
+    CGFloat centerDelta = rightLabel.yz_centerX - leftLabel.yz_centerX;
     
     // 获取移动距离
     CGFloat offsetDelta = offsetX - _lastOffsetX;
     
     // 计算当前下划线偏移量
     CGFloat underLineTransformX = offsetDelta * centerDelta / YZScreenW;
- 
-    if (_underLineWidth > 0.0) {
-        
+    
+    
+    //TODO:  长度有点跳动的问题
+    if (_underLineWidth > 0.0 || !_isUnderLineEqualTitleWidth) {
+        self.underLine.yz_x += underLineTransformX;
     } else {
+        // 标题宽度差值
+        CGFloat widthDelta = [self widthDeltaWithRightLabel:rightLabel leftLabel:leftLabel];
+
         // 宽度递增偏移量
         CGFloat underLineWidth = offsetDelta * widthDelta / YZScreenW;
         self.underLine.yz_width += underLineWidth;
+        
+        self.underLine.yz_x += underLineTransformX;
     }
-    self.underLine.yz_x += underLineTransformX;
+    
 }
 
 // 设置遮盖偏移
@@ -765,9 +771,7 @@ static NSString * const CellIndentifier = @"CellIndentifier";
 
 - (void)selectLabel:(UILabel *)label
 {
-    
     for (YZDisplayTitleLabel *labelView in self.titleLabels) {
-        
         if (label == labelView) continue;
         
         if (_isShowTitleGradient) {
@@ -784,7 +788,7 @@ static NSString * const CellIndentifier = @"CellIndentifier";
     
     // 标题缩放
     if (_isShowTitleScale) {
-        CGFloat scaleTransform = _titleScale?_titleScale:YZTitleTransformScale;
+        CGFloat scaleTransform = _titleScale ?: YZTitleTransformScale;
         label.transform = CGAffineTransformMakeScale(scaleTransform, scaleTransform);
     }
     
@@ -844,27 +848,10 @@ static NSString * const CellIndentifier = @"CellIndentifier";
     // 获取文字尺寸
     CGRect titleBounds = [label.text boundingRectWithSize:CGSizeMake(MAXFLOAT, 0) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:self.titleFont} context:nil];
     
-    CGFloat underLineH = _underLineHeight?_underLineHeight:YZUnderLineH;
+    CGFloat underLineH = _underLineHeight ?: YZUnderLineH;
     
     self.underLine.yz_y = label.yz_height - underLineH;
     self.underLine.yz_height = underLineH;
-    
-    
-    // 最开始不需要动画
-    if (self.underLine.yz_x == 0) {
-        if (_isUnderLineEqualTitleWidth) {
-            self.underLine.yz_width = titleBounds.size.width;
-        } else {
-            if (_underLineWidth > 0.0) {
-                self.underLine.yz_width = _underLineWidth;
-            } else {
-                self.underLine.yz_width = label.yz_width;
-            }
-        }
-        
-        self.underLine.yz_centerX = label.yz_centerX;
-        return;
-    }
     
     // 点击时候需要动画
     [UIView animateWithDuration:0.25 animations:^{
@@ -982,10 +969,10 @@ static NSString * const CellIndentifier = @"CellIndentifier";
     if (extre > YZScreenW * 0.5) {
         // 往右边移动
         offsetX = offsetX + (YZScreenW - extre);
-        _isAniming = YES;
+        _isAnimating = YES;
         [self.contentScrollView setContentOffset:CGPointMake(offsetX, 0) animated:YES];
     }else if (extre < YZScreenW * 0.5 && extre > 0){
-        _isAniming = YES;
+        _isAnimating = YES;
         // 往左边移动
         offsetX =  offsetX - extre;
         [self.contentScrollView setContentOffset:CGPointMake(offsetX, 0) animated:YES];
@@ -1008,22 +995,13 @@ static NSString * const CellIndentifier = @"CellIndentifier";
 // 监听滚动动画是否完成
 - (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView
 {
-    _isAniming = NO;
-}
-
-
-- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
-    if (self.dragingFollow) {
-        // 获取角标
-        NSInteger i = scrollView.contentOffset.x / YZScreenW;
-        [self setLabelTitleCenter:self.titleLabels[i]];
-    }
+    _isAnimating = NO;
 }
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
     // 点击和动画的时候不需要设置
-    if (_isAniming || self.titleLabels.count == 0) return;
+    if (_isAnimating || self.titleLabels.count == 0) return;
     
     // 获取偏移量
     CGFloat offsetX = scrollView.contentOffset.x;

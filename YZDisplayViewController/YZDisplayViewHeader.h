@@ -36,9 +36,6 @@
 // 导航条高度
 static CGFloat const YZNavBarH = 44;
 
-// 标题滚动视图的高度
-static CGFloat const YZTitleScrollViewH = 44;
-
 // 标题缩放比例
 static CGFloat const YZTitleTransformScale = 1.3;
 
