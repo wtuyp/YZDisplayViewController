@@ -38,7 +38,7 @@
 //        *isUnderLineDelayScroll = YES;
 //        *isUnderLineEqualTitleWidth = YES;
         *underLineH = 35;
-        *underLineWidth = 20;
+//        *underLineWidth = 20;
     }];
         
     // 字体缩放

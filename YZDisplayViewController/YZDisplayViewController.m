@@ -16,14 +16,10 @@ static NSString * const CellIndentifier = @"CellIndentifier";
 
 @interface YZDisplayViewController () <UICollectionViewDataSource, UICollectionViewDelegate>
 
-/** 记录上一次内容滚动视图偏移量 */
-@property (nonatomic, assign) CGFloat lastOffsetX;
+@property (nonatomic, assign) CGFloat startOffsetX;
 
 /** 记录是否点击 */
 @property (nonatomic, assign) BOOL isClickTitle;
-
-/** 记录是否在动画 */
-@property (nonatomic, assign) BOOL isAnimating;
 
 /* 是否初始化 */
 @property (nonatomic, assign) BOOL isInitial;
@@ -557,65 +553,52 @@ static NSString * const CellIndentifier = @"CellIndentifier";
 }
 
 #pragma mark - 标题效果渐变方法
-// 设置标题颜色渐变
-- (void)setUpTitleColorGradientWithOffset:(CGFloat)offsetX rightLabel:(YZDisplayTitleLabel *)rightLabel leftLabel:(YZDisplayTitleLabel *)leftLabel
-{
+- (void)updateTitleColorGradientWithSourceLabel:(YZDisplayTitleLabel *)sourceLabel targetLabel:(YZDisplayTitleLabel *)targetLabel progress:(CGFloat)progress {
     if (_isShowTitleGradient == NO) {
         return;
     }
     
-    // 获取右边缩放
-    CGFloat rightSacle = offsetX / YZScreenW - leftLabel.tag;
-    
-    // 获取左边缩放比例
-    CGFloat leftScale = 1 - rightSacle;
-    
     // RGB渐变
     if (_titleColorGradientStyle == YZTitleColorGradientStyleRGB) {
+        CGFloat deltaR = _endR - _startR;
+        CGFloat deltaG = _endG - _startG;
+        CGFloat deltaB = _endB - _startB;
         
-        CGFloat r = _endR - _startR;
-        CGFloat g = _endG - _startG;
-        CGFloat b = _endB - _startB;
-        
-        // rightColor
-        // 1 0 0
-        UIColor *rightColor = [UIColor colorWithRed:_startR + r * rightSacle green:_startG + g * rightSacle blue:_startB + b * rightSacle alpha:1];
-        
-        // 0.3 0 0
-        // 1 -> 0.3
-        // leftColor
-        UIColor *leftColor = [UIColor colorWithRed:_startR +  r * leftScale  green:_startG +  g * leftScale  blue:_startB + b * leftScale alpha:1];
-        
-        rightLabel.textColor = rightColor;
-        leftLabel.textColor = leftColor;
-        
-        return;
+        sourceLabel.textColor = [UIColor colorWithRed:_endR - progress * deltaR green:_endG - progress * deltaG blue:_endB - progress * deltaB alpha:1];
+        targetLabel.textColor = [UIColor colorWithRed:_startR + progress * deltaR green:_startG + progress * deltaG blue:_startB + progress * deltaB alpha:1];
     }
     
     // 填充渐变
     if (_titleColorGradientStyle == YZTitleColorGradientStyleFill) {
-        
-        // 获取移动距离
-        CGFloat offsetDelta = offsetX - _lastOffsetX;
-        
-        if (offsetDelta > 0) { // 往右边
-            rightLabel.textColor = self.norColor;
-            rightLabel.fillColor = self.selColor;
-            rightLabel.progress = rightSacle;
+        if (sourceLabel.index < targetLabel.index) {    //向左滑
+            sourceLabel.textColor = self.selColor;
+            sourceLabel.fillColor = self.norColor;
+            sourceLabel.progress = progress;
             
-            leftLabel.textColor = self.selColor;
-            leftLabel.fillColor = self.norColor;
-            leftLabel.progress = rightSacle;
-        } else if(offsetDelta < 0){ // 往左边
-            rightLabel.textColor = self.norColor;
-            rightLabel.fillColor = self.selColor;
-            rightLabel.progress = rightSacle;
+            targetLabel.textColor = self.norColor;
+            targetLabel.fillColor = self.selColor;
+            targetLabel.progress = progress;
+        } else if (sourceLabel.index > targetLabel.index) {//向右滑
+            sourceLabel.textColor = self.norColor;
+            sourceLabel.fillColor = self.selColor;
+            sourceLabel.progress = 1 - progress;
             
-            leftLabel.textColor = self.selColor;
-            leftLabel.fillColor = self.norColor;
-            leftLabel.progress = rightSacle;
+            targetLabel.textColor = self.selColor;
+            targetLabel.fillColor = self.norColor;
+            targetLabel.progress = 1 - progress;
         }
     }
+}
+
+- (void)updateTitleScaleWithSourceLabel:(UILabel *)sourceLabel targetLabel:(UILabel *)targetLabel progress:(CGFloat)progress {
+    if (!_isShowTitleScale) {
+        return;
+    }
+    
+    CGFloat maxScaleFactor = _titleScale ?: YZTitleTransformScale;
+    CGFloat deltaScale = maxScaleFactor - 1.0;
+    sourceLabel.transform = CGAffineTransformMakeScale(maxScaleFactor - progress * deltaScale, maxScaleFactor - progress * deltaScale);
+    targetLabel.transform = CGAffineTransformMakeScale(1.0 + progress * deltaScale, 1.0 + progress * deltaScale);
 }
 
 // 标题缩放
@@ -630,7 +613,7 @@ static NSString * const CellIndentifier = @"CellIndentifier";
     
     CGFloat leftScale = 1 - rightSacle;
     
-    CGFloat scaleTransform = _titleScale ? _titleScale : YZTitleTransformScale;
+    CGFloat scaleTransform = _titleScale ?: YZTitleTransformScale;
     
     scaleTransform -= 1;
     
@@ -651,63 +634,26 @@ static NSString * const CellIndentifier = @"CellIndentifier";
     return titleBoundsR.size.width - titleBoundsL.size.width;
 }
 
-// 设置下标偏移
-- (void)setUpUnderLineOffset:(CGFloat)offsetX rightLabel:(UILabel *)rightLabel leftLabel:(UILabel *)leftLabel
-{
+- (void)updateUnderLineWithSourceLabel:(UILabel *)sourceLabel targetLabel:(UILabel *)targetLabel progress:(CGFloat)progress {
     if (_isClickTitle) {
         return;
     }
     
-    
- 
-    // 获取两个标题中心点距离
-    CGFloat centerDelta = rightLabel.yz_centerX - leftLabel.yz_centerX;
-    
-    // 获取移动距离
-    CGFloat offsetDelta = offsetX - _lastOffsetX;
-    
-    // 计算当前下划线偏移量
-    CGFloat underLineTransformX = offsetDelta * centerDelta / YZScreenW;
-    
-    if (_underLineWidth > 0.0 || !_isUnderLineEqualTitleWidth) {
-        self.underLine.yz_x += underLineTransformX;
-    } else {
-        // 标题宽度差值
-        CGFloat widthDelta = [self widthDeltaWithRightLabel:rightLabel leftLabel:leftLabel];
-
-        // 宽度递增偏移量
-        CGFloat underLineWidth = offsetDelta * widthDelta / YZScreenW;
-        self.underLine.yz_width += underLineWidth;
-        
-        self.underLine.yz_x += underLineTransformX;
-    }
-    
+    CGFloat deltaX = targetLabel.frame.origin.x - sourceLabel.frame.origin.x;
+    CGFloat deltaW = targetLabel.frame.size.width - sourceLabel.frame.size.width;
+    self.underLine.yz_x = sourceLabel.frame.origin.x + progress * deltaX;
+    self.underLine.yz_width = sourceLabel.frame.size.width + progress * deltaW;
 }
 
-// 设置遮盖偏移
-- (void)setUpCoverOffset:(CGFloat)offsetX rightLabel:(UILabel *)rightLabel leftLabel:(UILabel *)leftLabel
-{
+- (void)updateCoverWithSourceLabel:(UILabel *)sourceLabel targetLabel:(UILabel *)targetLabel progress:(CGFloat)progress {
     if (_isClickTitle) {
         return;
     }
     
-    // 获取两个标题中心点距离
-    CGFloat centerDelta = rightLabel.yz_x - leftLabel.yz_x;
-    
-    // 标题宽度差值
-    CGFloat widthDelta = [self widthDeltaWithRightLabel:rightLabel leftLabel:leftLabel];
-    
-    // 获取移动距离
-    CGFloat offsetDelta = offsetX - _lastOffsetX;
-    
-    // 计算当前下划线偏移量
-    CGFloat coverTransformX = offsetDelta * centerDelta / YZScreenW;
-    
-    // 宽度递增偏移量
-    CGFloat coverWidth = offsetDelta * widthDelta / YZScreenW;
-    
-    self.coverView.yz_width += coverWidth;
-    self.coverView.yz_x += coverTransformX;
+    CGFloat deltaX = targetLabel.frame.origin.x - sourceLabel.frame.origin.x;
+    CGFloat deltaW = targetLabel.frame.size.width - sourceLabel.frame.size.width;
+    self.coverView.yz_width = sourceLabel.yz_width + deltaW * progress + 10;    //TODO: 后续增加 cover margin 属性
+    self.coverView.yz_x = sourceLabel.yz_x + deltaX * progress - 5;
 }
 
 #pragma mark - 标题点击处理
@@ -743,10 +689,7 @@ static NSString * const CellIndentifier = @"CellIndentifier";
     // 内容滚动视图滚动到对应位置
     CGFloat offsetX = i * YZScreenW;
     
-    self.contentScrollView.contentOffset = CGPointMake(offsetX, 0);
-    
-    // 记录上一次偏移量,因为点击的时候不会调用scrollView代理记录，因此需要主动记录
-    _lastOffsetX = offsetX;
+    self.contentScrollView.contentOffset = CGPointMake(offsetX, 0); //不会触发 scrollView 代理
     
     // 添加控制器
     UIViewController *vc = self.childViewControllers[i];
@@ -825,13 +768,13 @@ static NSString * const CellIndentifier = @"CellIndentifier";
     self.coverView.yz_height = coverH;
     
     
-    // 最开始不需要动画
-    if (self.coverView.yz_x == 0) {
-        self.coverView.yz_width = coverW;
-        
-        self.coverView.yz_x = label.yz_x - border;
-        return;
-    }
+//    // 最开始不需要动画
+//    if (self.coverView.yz_x == 0) {
+//        self.coverView.yz_width = coverW;
+//
+//        self.coverView.yz_x = label.yz_x - border;
+//        return;
+//    }
     
     // 点击时候需要动画
     [UIView animateWithDuration:0.25 animations:^{
@@ -939,19 +882,9 @@ static NSString * const CellIndentifier = @"CellIndentifier";
     // 添加控制器
     UIViewController *vc = self.childViewControllers[indexPath.row];
     
+//    vc.view.frame = self.contentScrollView.bounds;
     vc.view.frame = CGRectMake(0, 0, self.contentScrollView.yz_width, self.contentScrollView.yz_height);
-    
-//    CGFloat bottom = self.tabBarController == nil?0:49;
-//    CGFloat top = _isfullScreen?CGRectGetMaxY(self.titleScrollView.frame):0;
-//    if ([vc isKindOfClass:[UITableViewController class]]) {
-//        UITableViewController *tableViewVc = (UITableViewController *)vc;
-//        tableViewVc.tableView.contentInset = UIEdgeInsetsMake(top, 0, bottom, 0);
-//        if (@available(iOS 11.0, *)) {
-//            tableViewVc.tableView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
-//        } else {
-//            // Fallback on earlier versions
-//        }
-//    }
+    vc.view.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin;
     
     [cell.contentView addSubview:vc.view];
     
@@ -959,29 +892,10 @@ static NSString * const CellIndentifier = @"CellIndentifier";
 }
 
 #pragma mark - UIScrollViewDelegate
-
-// 减速完成
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
-    CGFloat offsetX = scrollView.contentOffset.x;
-    NSInteger offsetXInt = offsetX;
-    NSInteger screenWInt = YZScreenW;
-    
-    NSInteger extre = offsetXInt % screenWInt;
-    if (extre > YZScreenW * 0.5) {
-        _isAnimating = YES;
-        // 往右边移动
-        offsetX = offsetX + (YZScreenW - extre);
-        [self.contentScrollView setContentOffset:CGPointMake(offsetX, 0) animated:YES];
-    } else if (extre < YZScreenW * 0.5 && extre > 0){
-        _isAnimating = YES;
-        // 往左边移动
-        offsetX =  offsetX - extre;
-        [self.contentScrollView setContentOffset:CGPointMake(offsetX, 0) animated:YES];
-    }
-    
-    // 获取角标
-    NSInteger i = offsetX / YZScreenW;
+    CGFloat itemWidth = CGRectGetWidth(scrollView.frame);
+    NSInteger i = (scrollView.contentOffset.x + itemWidth * 0.5) / itemWidth;
     
     // 选中标题
     [self selectLabel:self.titleLabels[i]];
@@ -993,53 +907,88 @@ static NSString * const CellIndentifier = @"CellIndentifier";
     [[NSNotificationCenter defaultCenter] postNotificationName:YZDisplayViewClickOrScrollDidFinshNote object:vc];
 }
 
+- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
+    if (!decelerate) {
+        CGFloat itemWidth = CGRectGetWidth(scrollView.frame);
+        NSInteger i = (scrollView.contentOffset.x + itemWidth * 0.5) / itemWidth;
+        
+        // 选中标题
+        [self selectLabel:self.titleLabels[i]];
+    }
+}
 
-// 监听滚动动画是否完成
-- (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView
-{
-    _isAnimating = NO;
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
+    _startOffsetX = scrollView.contentOffset.x;
 }
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
     // 点击和动画的时候不需要设置
-    if (_isAnimating || self.titleLabels.count == 0) return;
-    
-    // 获取偏移量
-    CGFloat offsetX = scrollView.contentOffset.x;
-    
-    // 获取左边角标
-    NSInteger leftIndex = offsetX / YZScreenW;
-    
-    // 左边按钮
-    YZDisplayTitleLabel *leftLabel = self.titleLabels[leftIndex];
-    
-    // 右边角标
-    NSInteger rightIndex = leftIndex + 1;
-    
-    // 右边按钮
-    YZDisplayTitleLabel *rightLabel = nil;
-    
-    if (rightIndex < self.titleLabels.count) {
-        rightLabel = self.titleLabels[rightIndex];
+    if (self.titleLabels.count == 0) {
+        return;
     }
     
-    // 字体放大
-    [self setUpTitleScaleWithOffset:offsetX rightLabel:rightLabel leftLabel:leftLabel];
+    [self updateUI:scrollView];
+}
+
+- (void)updateUI:(UIScrollView *)scrollView {
+    CGFloat progress = 0.0;
+    NSInteger targetIndex = 0;
+    NSInteger sourceIndex = 0;
+
+    NSInteger index = (NSInteger)(scrollView.contentOffset.x / scrollView.bounds.size.width);
     
-    // 设置下标偏移
-    if (_isDelayScroll == NO) { // 延迟滚动，不需要移动下标
-        [self setUpUnderLineOffset:offsetX rightLabel:rightLabel leftLabel:leftLabel];
+    progress = (scrollView.contentOffset.x - scrollView.bounds.size.width * index) / scrollView.bounds.size.width;
+    if (progress == 0.0) {
+        return;
     }
     
-    // 设置遮盖偏移
-    [self setUpCoverOffset:offsetX rightLabel:rightLabel leftLabel:leftLabel];
+    if (scrollView.contentOffset.x > _startOffsetX) {   //左滑动
+        sourceIndex = index;
+        targetIndex = index + 1;
+        if (targetIndex > self.childViewControllers.count) {
+            return;
+        }
+    } else {
+        sourceIndex = index + 1;
+        targetIndex = index;
+        progress = 1 - progress;
+        if (targetIndex < 0) {
+            return;
+        }
+    }
     
-    // 设置标题渐变
-    [self setUpTitleColorGradientWithOffset:offsetX rightLabel:rightLabel leftLabel:leftLabel];
+    if (progress > 0.998) {
+        progress = 1.0;
+    }
     
-    // 记录上一次的偏移量
-    _lastOffsetX = offsetX;
+    [self updateTitleScrollViewWithSourceIndex:sourceIndex targetIndex:targetIndex progress:progress];
+}
+
+
+- (void)updateTitleScrollViewWithSourceIndex:(NSInteger)sourceIndex targetIndex:(NSInteger)targetIndex progress:(CGFloat)progress {
+    if (sourceIndex > self.titleLabels.count - 1 || sourceIndex < 0) {
+        return;
+    }
+    if (targetIndex > self.titleLabels.count - 1 || targetIndex < 0) {
+        return;
+    }
+    
+    YZDisplayTitleLabel *sourceLabel = self.titleLabels[sourceIndex];
+    sourceLabel.index = sourceIndex;
+    
+    YZDisplayTitleLabel *targetLabel = self.titleLabels[targetIndex];
+    targetLabel.index = targetIndex;
+    
+    [self updateTitleScaleWithSourceLabel:sourceLabel targetLabel:targetLabel progress:progress];
+    
+    if (!_isDelayScroll) {
+        [self updateUnderLineWithSourceLabel:sourceLabel targetLabel:targetLabel progress:progress];
+    }
+    
+    [self updateCoverWithSourceLabel:sourceLabel targetLabel:targetLabel progress:progress];
+    
+    [self updateTitleColorGradientWithSourceLabel:sourceLabel targetLabel:targetLabel progress:progress];
 }
 
 @end

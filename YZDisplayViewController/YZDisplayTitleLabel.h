@@ -14,4 +14,6 @@
 
 @property (nonatomic, strong) UIColor *fillColor;
 
+@property (nonatomic, assign) NSInteger index;
+
 @end
