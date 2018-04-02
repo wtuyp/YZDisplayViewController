@@ -140,6 +140,67 @@ static NSString * const CellIndentifier = @"CellIndentifier";
     self.automaticallyAdjustsScrollViewInsets = NO;
 }
 
+#pragma mark - 控制器view生命周期方法
+- (void)viewDidLayoutSubviews
+{
+    [super viewDidLayoutSubviews];
+    
+    if (_isInitial == NO) {
+        self.selectIndex = _selectIndex;
+        
+        _isInitial = YES;
+        
+        CGFloat statusH = [UIApplication sharedApplication].statusBarFrame.size.height;
+        
+        CGFloat titleY = !self.navigationController.isNavigationBarHidden ? (44.0 + statusH) : statusH;
+        
+        // 是否占据全屏
+        if (_isfullScreen) {
+            
+            // 整体contentView尺寸
+            self.contentView.frame = CGRectMake(0, 0, YZScreenW, YZScreenH);
+            
+            // 顶部标题View尺寸
+            self.titleScrollView.frame = CGRectMake(0, titleY, YZScreenW, self.titleHeight);
+            
+            // 顶部内容View尺寸
+            self.contentScrollView.frame = self.contentView.bounds;
+            
+            return;
+        }
+        
+        if (self.contentView.frame.size.height == 0) {
+            self.contentView.frame = CGRectMake(0, titleY, YZScreenW, YZScreenH - titleY);
+        }
+        
+        // 顶部标题View尺寸
+        self.titleScrollView.frame = CGRectMake(0, 0, YZScreenW, self.titleHeight);
+        
+        // 顶部内容View尺寸
+        CGFloat contentY = CGRectGetMaxY(self.titleScrollView.frame);
+        CGFloat contentH = self.contentView.yz_height - contentY;
+        self.contentScrollView.frame = CGRectMake(0, contentY, YZScreenW, contentH);
+    }
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    
+    if (_isInitial == NO) {
+        
+        // 没有子控制器，不需要设置标题
+        if (self.childViewControllers.count == 0) {
+            return;
+        }
+        
+        if (_titleColorGradientStyle == YZTitleColorGradientStyleFill || _titleWidth == 0) { // 填充样式才需要这样
+            [self setUpTitleWidth];
+        }
+        [self setUpAllTitle];
+    }
+}
+
 #pragma mark - 懒加载
 - (UIFont *)titleFont
 {
@@ -350,7 +411,6 @@ static NSString * const CellIndentifier = @"CellIndentifier";
     
     _isShowUnderLine = YES;
 
-    
     if (underLineBlock) {
         UIColor *underLineColorTemp;
         underLineBlock(&_isDelayScroll, &_underLineHeight, &_underLineWidth, &underLineColorTemp, &_isUnderLineEqualTitleWidth);
@@ -386,67 +446,6 @@ static NSString * const CellIndentifier = @"CellIndentifier";
     
     if (_titleColorGradientStyle == YZTitleColorGradientStyleFill && _titleWidth > 0) {
         @throw [NSException exceptionWithName:@"YZDisplayViewControllerException" reason:@"标题颜色填充不需要设置标题宽度" userInfo:nil];
-    }
-}
-
-#pragma mark - 控制器view生命周期方法
-- (void)viewDidLayoutSubviews
-{
-    [super viewDidLayoutSubviews];
-    
-    if (_isInitial == NO) {
-        self.selectIndex = _selectIndex;
-
-        _isInitial = YES;
-        
-        CGFloat statusH = [UIApplication sharedApplication].statusBarFrame.size.height;
-        
-        CGFloat titleY = !self.navigationController.isNavigationBarHidden ? (YZNavBarH + statusH) : statusH;
-
-        // 是否占据全屏
-        if (_isfullScreen) {
-            
-            // 整体contentView尺寸
-            self.contentView.frame = CGRectMake(0, 0, YZScreenW, YZScreenH);
-            
-            // 顶部标题View尺寸
-            self.titleScrollView.frame = CGRectMake(0, titleY, YZScreenW, self.titleHeight);
-            
-            // 顶部内容View尺寸
-            self.contentScrollView.frame = self.contentView.bounds;
-            
-            return;
-        }
-        
-        if (self.contentView.frame.size.height == 0) {
-            self.contentView.frame = CGRectMake(0, titleY, YZScreenW, YZScreenH - titleY);
-        }
-        
-        // 顶部标题View尺寸
-        self.titleScrollView.frame = CGRectMake(0, 0, YZScreenW, self.titleHeight);
-        
-        // 顶部内容View尺寸
-        CGFloat contentY = CGRectGetMaxY(self.titleScrollView.frame);
-        CGFloat contentH = self.contentView.yz_height - contentY;
-        self.contentScrollView.frame = CGRectMake(0, contentY, YZScreenW, contentH);
-    }
-}
-
-- (void)viewWillAppear:(BOOL)animated
-{
-    [super viewWillAppear:animated];
-    
-    if (_isInitial == NO) {
-                
-        // 没有子控制器，不需要设置标题
-        if (self.childViewControllers.count == 0) {
-            return;
-        }
-        
-        if (_titleColorGradientStyle == YZTitleColorGradientStyleFill || _titleWidth == 0) { // 填充样式才需要这样
-            [self setUpTitleWidth];
-        }
-        [self setUpAllTitle];
     }
 }
 
@@ -552,7 +551,7 @@ static NSString * const CellIndentifier = @"CellIndentifier";
     
 }
 
-#pragma mark - 标题效果渐变方法
+#pragma mark - 更新标题效果
 - (void)updateTitleColorGradientWithSourceLabel:(YZDisplayTitleLabel *)sourceLabel targetLabel:(YZDisplayTitleLabel *)targetLabel progress:(CGFloat)progress {
     if (_isShowTitleGradient == NO) {
         return;
@@ -599,39 +598,6 @@ static NSString * const CellIndentifier = @"CellIndentifier";
     CGFloat deltaScale = maxScaleFactor - 1.0;
     sourceLabel.transform = CGAffineTransformMakeScale(maxScaleFactor - progress * deltaScale, maxScaleFactor - progress * deltaScale);
     targetLabel.transform = CGAffineTransformMakeScale(1.0 + progress * deltaScale, 1.0 + progress * deltaScale);
-}
-
-// 标题缩放
-- (void)setUpTitleScaleWithOffset:(CGFloat)offsetX rightLabel:(UILabel *)rightLabel leftLabel:(UILabel *)leftLabel
-{
-    if (!_isShowTitleScale) {
-        return;
-    }
-    
-    // 获取右边缩放
-    CGFloat rightSacle = offsetX / YZScreenW - leftLabel.tag;
-    
-    CGFloat leftScale = 1 - rightSacle;
-    
-    CGFloat scaleTransform = _titleScale ?: YZTitleTransformScale;
-    
-    scaleTransform -= 1;
-    
-    // 缩放按钮
-    leftLabel.transform = CGAffineTransformMakeScale(leftScale * scaleTransform + 1, leftScale * scaleTransform + 1);
-    
-    // 1 ~ 1.3
-    rightLabel.transform = CGAffineTransformMakeScale(rightSacle * scaleTransform + 1, rightSacle * scaleTransform + 1);
-}
-
-// 获取两个标题按钮宽度差值
-- (CGFloat)widthDeltaWithRightLabel:(UILabel *)rightLabel leftLabel:(UILabel *)leftLabel
-{
-    CGRect titleBoundsR = [rightLabel.text boundingRectWithSize:CGSizeMake(MAXFLOAT, 0) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:self.titleFont} context:nil];
-    
-    CGRect titleBoundsL = [leftLabel.text boundingRectWithSize:CGSizeMake(MAXFLOAT, 0) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:self.titleFont} context:nil];
-    
-    return titleBoundsR.size.width - titleBoundsL.size.width;
 }
 
 - (void)updateUnderLineWithSourceLabel:(UILabel *)sourceLabel targetLabel:(UILabel *)targetLabel progress:(CGFloat)progress {
@@ -711,10 +677,12 @@ static NSString * const CellIndentifier = @"CellIndentifier";
     _isClickTitle = NO;
 }
 
-- (void)selectLabel:(UILabel *)label
+- (void)selectLabel:(YZDisplayTitleLabel *)label
 {
     for (YZDisplayTitleLabel *labelView in self.titleLabels) {
-        if (label == labelView) continue;
+        if (label == labelView) {
+            continue;
+        }
         
         if (_isShowTitleGradient) {
             labelView.transform = CGAffineTransformIdentity;
@@ -728,17 +696,21 @@ static NSString * const CellIndentifier = @"CellIndentifier";
         }
     }
     
+    // 修改标题选中颜色
+    label.textColor = self.selColor;
+    if (_isShowTitleGradient && _titleColorGradientStyle == YZTitleColorGradientStyleFill) {
+        label.fillColor = self.norColor;
+        label.progress = 0;
+    }
+    
+    // 设置标题居中
+    [self setLabelTitleCenter:label];
+    
     // 标题缩放
     if (_isShowTitleScale) {
         CGFloat scaleTransform = _titleScale ?: YZTitleTransformScale;
         label.transform = CGAffineTransformMakeScale(scaleTransform, scaleTransform);
     }
-    
-    // 修改标题选中颜色
-    label.textColor = self.selColor;
-    
-    // 设置标题居中
-    [self setLabelTitleCenter:label];
     
     // 设置下标的位置
     [self setUpUnderLine:label];
@@ -766,15 +738,6 @@ static NSString * const CellIndentifier = @"CellIndentifier";
     
     self.coverView.yz_y = (label.yz_height - coverH) * 0.5;
     self.coverView.yz_height = coverH;
-    
-    
-//    // 最开始不需要动画
-//    if (self.coverView.yz_x == 0) {
-//        self.coverView.yz_width = coverW;
-//
-//        self.coverView.yz_x = label.yz_x - border;
-//        return;
-//    }
     
     // 点击时候需要动画
     [UIView animateWithDuration:0.25 animations:^{
