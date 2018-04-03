@@ -154,21 +154,6 @@ static NSString * const CellIndentifier = @"CellIndentifier";
         
         CGFloat titleY = !self.navigationController.isNavigationBarHidden ? (44.0 + statusH) : statusH;
         
-        // 是否占据全屏
-        if (_isfullScreen) {
-            
-            // 整体contentView尺寸
-            self.contentView.frame = CGRectMake(0, 0, YZScreenW, YZScreenH);
-            
-            // 顶部标题View尺寸
-            self.titleScrollView.frame = CGRectMake(0, titleY, YZScreenW, self.titleHeight);
-            
-            // 顶部内容View尺寸
-            self.contentScrollView.frame = self.contentView.bounds;
-            
-            return;
-        }
-        
         if (self.contentView.frame.size.height == 0) {
             self.contentView.frame = CGRectMake(0, titleY, YZScreenW, YZScreenH - titleY);
         }
@@ -347,14 +332,6 @@ static NSString * const CellIndentifier = @"CellIndentifier";
     self.titleScrollView.backgroundColor = titleScrollViewColor;
 }
 
-- (void)setIsfullScreen:(BOOL)isfullScreen
-{
-    _isfullScreen = isfullScreen;
-    
-    self.contentView.frame = CGRectMake(0, 0, YZScreenW, YZScreenH);
-    
-}
-
 // 一次性设置所有颜色渐变属性
 - (void)setUpTitleGradient:(void (^)(YZTitleColorGradientStyle *titleColorGradientStyle, UIColor **norColor, UIColor **selColor))titleGradientBlock;
 {
@@ -403,7 +380,7 @@ static NSString * const CellIndentifier = @"CellIndentifier";
 }
 
 // 一次性设置所有下标属性
-- (void)setUpUnderLineEffect:(void(^)(BOOL *isUnderLineDelayScroll,CGFloat *underLineH,CGFloat *underLineWidth,UIColor **underLineColor,BOOL *isUnderLineEqualTitleWidth))underLineBlock
+- (void)setUpUnderLineEffect:(void(^)(BOOL *isUnderLineDelayScroll, CGFloat *underLineH, CGFloat *underLineWidth, UIColor **underLineColor, BOOL *isUnderLineEqualTitleWidth))underLineBlock
 {
     if (_isShowTitleScale) {
         @throw [NSException exceptionWithName:@"YZDisplayViewControllerException" reason:@"当前框架下标和字体缩放不能一起用" userInfo:nil];
@@ -644,7 +621,7 @@ static NSString * const CellIndentifier = @"CellIndentifier";
     _isClickTitle = YES;
     
     // 获取对应标题label
-    UILabel *label = (UILabel *)tap.view;
+    YZDisplayTitleLabel *label = (YZDisplayTitleLabel *)tap.view;
     
     // 获取当前角标
     NSInteger i = label.tag;

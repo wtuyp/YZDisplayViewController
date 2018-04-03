@@ -25,12 +25,6 @@ typedef enum : NSUInteger {
 /** 内容滚动视图 */
 @property (nonatomic, strong) UICollectionView *contentScrollView;
 
-/** 内容是否需要全屏展示
-    YES :  全屏：内容占据整个屏幕，会有穿透导航栏效果，需要手动设置tableView额外滚动区域
-    NO  :  内容从标题下展示
- */
-@property (nonatomic, assign) BOOL isfullScreen;
-
 /** 根据角标，选中对应的控制器 */
 @property (nonatomic, assign) NSInteger selectIndex;
 

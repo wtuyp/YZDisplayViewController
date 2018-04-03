@@ -8,6 +8,8 @@
 
 #import "YZMainTableViewController.h"
 
+#import "AYPageViewController.h"
+
 @interface YZMainTableViewController ()
 
 @property (strong, nonatomic) NSArray *demos;
@@ -19,7 +21,7 @@
 #pragma mark - 懒加载
 - (NSArray *)demos {
     if (_demos == nil) {
-        _demos = @[@"腾讯",@"今日头条", @"网易",@"喜马拉雅"];
+        _demos = @[@"腾讯",@"今日头条", @"网易",@"喜马拉雅", @"AYPageView"];
     }
     
     return _demos;
@@ -63,6 +65,12 @@
             break;
         } case 3:{
             [self performSegueWithIdentifier:@"YZXiMaViewController" sender:nil];
+            
+            break;
+        } case 4:{
+            [self.navigationController pushViewController:[[AYPageViewController alloc] init] animated:YES];
+            
+            
             
             break;
         }

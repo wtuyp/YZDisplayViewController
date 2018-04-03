@@ -38,17 +38,11 @@
         // 标题填充模式
         *underLineColor = [UIColor redColor];
     }];
-    
-    // 设置全屏显示
-    // 如果有导航控制器或者tabBarController,需要设置tableView额外滚动区域,详情请看FullChildViewController
-    self.isfullScreen = YES;
-//    self.dragingFollow = YES;
 }
 
 // 添加所有子控制器
 - (void)setUpAllViewController
 {
-    
     // 段子
     FullChildViewController *wordVc1 = [[FullChildViewController alloc] init];
     wordVc1.title = @"小码哥";

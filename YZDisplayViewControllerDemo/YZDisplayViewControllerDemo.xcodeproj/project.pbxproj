@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		EB6BA434207218060099D2FB /* AYPageTitleView.m in Sources */ = {isa = PBXBuildFile; fileRef = EB6BA433207218060099D2FB /* AYPageTitleView.m */; };
+		EB6BA437207236DD0099D2FB /* AYPageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EB6BA436207236DD0099D2FB /* AYPageViewController.m */; };
 		EC0169BD1C2EB399009616E9 /* YZMainTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EC0169BC1C2EB399009616E9 /* YZMainTableViewController.m */; };
 		EC01A8841C12883C00F91F25 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = EC01A8831C12883C00F91F25 /* main.m */; };
 		EC01A8871C12883C00F91F25 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = EC01A8861C12883C00F91F25 /* AppDelegate.m */; };
@@ -45,6 +47,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		EB6BA432207218060099D2FB /* AYPageTitleView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AYPageTitleView.h; sourceTree = "<group>"; };
+		EB6BA433207218060099D2FB /* AYPageTitleView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AYPageTitleView.m; sourceTree = "<group>"; };
+		EB6BA435207236DD0099D2FB /* AYPageViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AYPageViewController.h; sourceTree = "<group>"; };
+		EB6BA436207236DD0099D2FB /* AYPageViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AYPageViewController.m; sourceTree = "<group>"; };
 		EC0169BB1C2EB399009616E9 /* YZMainTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YZMainTableViewController.h; sourceTree = "<group>"; };
 		EC0169BC1C2EB399009616E9 /* YZMainTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YZMainTableViewController.m; sourceTree = "<group>"; };
 		EC01A87F1C12883C00F91F25 /* YZDisplayViewControllerDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = YZDisplayViewControllerDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -109,11 +115,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		EB6BA431207217CA0099D2FB /* AYPageView */ = {
+			isa = PBXGroup;
+			children = (
+				EB6BA432207218060099D2FB /* AYPageTitleView.h */,
+				EB6BA433207218060099D2FB /* AYPageTitleView.m */,
+			);
+			path = AYPageView;
+			sourceTree = "<group>";
+		};
 		EC0169BA1C2EB381009616E9 /* Main */ = {
 			isa = PBXGroup;
 			children = (
 				EC0169BB1C2EB399009616E9 /* YZMainTableViewController.h */,
 				EC0169BC1C2EB399009616E9 /* YZMainTableViewController.m */,
+				EB6BA435207236DD0099D2FB /* AYPageViewController.h */,
+				EB6BA436207236DD0099D2FB /* AYPageViewController.m */,
 			);
 			path = Main;
 			sourceTree = "<group>";
@@ -141,6 +158,7 @@
 		EC01A8811C12883C00F91F25 /* YZDisplayViewControllerDemo */ = {
 			isa = PBXGroup;
 			children = (
+				EB6BA431207217CA0099D2FB /* AYPageView */,
 				ECE168461D44899D00AFC3A0 /* YZDisplayViewController */,
 				EC0169BA1C2EB381009616E9 /* Main */,
 				ECBE97A41C1330BF00A7F2B4 /* 腾讯视频 */,
@@ -312,7 +330,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 0710;
-				ORGANIZATIONNAME = yz;
+				ORGANIZATIONNAME = "tlm group";
 				TargetAttributes = {
 					EC01A87E1C12883B00F91F25 = {
 						CreatedOnToolsVersion = 7.1.1;
@@ -380,6 +398,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				EC6268841C1289F6000FB840 /* YZWYViewController.m in Sources */,
+				EB6BA437207236DD0099D2FB /* AYPageViewController.m in Sources */,
 				EC6268811C1289E4000FB840 /* YZXiMaViewController.m in Sources */,
 				ECBE97A71C1330DE00A7F2B4 /* YZTXViewController.m in Sources */,
 				EC6268931C128F63000FB840 /* ChildViewController.m in Sources */,
@@ -389,6 +408,7 @@
 				ECE168521D44899D00AFC3A0 /* YZDisplayViewController.m in Sources */,
 				EC0169BD1C2EB399009616E9 /* YZMainTableViewController.m in Sources */,
 				ECE168511D44899D00AFC3A0 /* YZDisplayTitleLabel.m in Sources */,
+				EB6BA434207218060099D2FB /* AYPageTitleView.m in Sources */,
 				EC01A8841C12883C00F91F25 /* main.m in Sources */,
 				EC6268871C128A0A000FB840 /* YZJRViewController.m in Sources */,
 				ECE168501D44899D00AFC3A0 /* UIView+Frame.m in Sources */,
