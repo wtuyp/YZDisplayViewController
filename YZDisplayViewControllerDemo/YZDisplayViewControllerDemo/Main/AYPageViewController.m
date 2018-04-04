@@ -9,11 +9,19 @@
 #import "AYPageViewController.h"
 #import "AYPageTitleView.h"
 #import "UIView+Frame.h"
+#import "AYPageContentView.h"
+
+#import "ChildViewController.h"
+
+
 @interface AYPageViewController ()
 
 @end
 
-@implementation AYPageViewController
+@implementation AYPageViewController {
+    AYPageTitleView *titleView;
+    AYPageContentView *contentView;
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -25,7 +33,7 @@
     
 //    AYPageTitleView *titleView = [[AYPageTitleView alloc] initWithFrame:CGRectMake(0, 100, self.view.yz_width, 44) titles:@[@"标题一", @"标题一二", @"标题一二三", @"标题一二三四", @"标题a", @"标题b", @"标题c", @"标题d", @"标题e", @"标题f"]];
     
-    AYPageTitleView *titleView = [[AYPageTitleView alloc] init];
+    titleView = [[AYPageTitleView alloc] init];
     titleView.titles = @[@"标题一", @"标题一二", @"标题一二三", @"标题一二三四", @"标题a", @"标题b", @"标题c", @"标题d", @"标题e", @"标题f"];
     titleView.frame = CGRectMake(0, 100, self.view.yz_width, 44);
     titleView.titleViewBackgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.2];
@@ -38,7 +46,7 @@
 //    titleView.lineViewColor = [UIColor yellowColor];
 //    titleView.lineViewWidth = 30;
 
-//    titleView.isShowCoverView = YES;
+    titleView.isShowCoverView = YES;
 //    titleView.coverViewColor = [UIColor yellowColor];
 //    titleView.coverViewHeight = 40;
 //    titleView.coverViewRadius = 0;
@@ -65,6 +73,10 @@
     [self.view addSubview:titleView1];
     titleView1.center = self.view.center;
     titleView1.titles = @[@"标题一", @"标题一二", @"标题一二三", @"标题一二三四", @"标题a", @"标题b"];
+    
+    contentView = [[AYPageContentView alloc] initWithFrame:CGRectMake(10, CGRectGetMaxY(titleView.frame) + 5, self.view.yz_width - 20, CGRectGetMinY(titleView1.frame) - CGRectGetMaxY(titleView.frame) - 10) childViewControllers:[self childVCs] currentIndex:0];
+    contentView.delegate = (id<AYPageContentViewDelegate>)self;
+    [self.view addSubview:contentView];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -72,12 +84,35 @@
     // Dispose of any resources that can be recreated.
 }
 
+- (NSArray *)childVCs {
+    NSMutableArray *array = [NSMutableArray array];
+    for (NSInteger i = 0; i < 10; i++) {
+        UIViewController *vc = [[UIViewController alloc] init];
+        vc.view.backgroundColor = [UIColor colorWithRed:arc4random_uniform(256) / 255.0 green:arc4random_uniform(256) / 255.0 blue:arc4random_uniform(256) / 255.0 alpha:1];
+        [array addObject:vc];
+    }
+    return [array copy];
+}
 #pragma mark - AYPageTitleViewDelegate
 - (void)titleView:(AYPageTitleView *)titleView clickAtIndex:(NSUInteger)index {
-    NSLog(@"点到我了 = %@", [titleView.titleLabels[index] text]);
+    NSLog(@"titleView 点到我了 = %@", [titleView.titleLabels[index] text]);
+    
+    [contentView scrollToIndex:index];
 
 }
 - (void)titleView:(AYPageTitleView *)titleView repeatClickAtIndex:(NSUInteger)index {
-    NSLog(@"又点到我了 = %@", [titleView.titleLabels[index] text]);
+    NSLog(@"titleView 又点到我了 = %@", [titleView.titleLabels[index] text]);
+}
+
+#pragma mark - AYPageContentViewDelegate
+- (void)contentView:(AYPageContentView *)contentView didSEndScrollAtIndex:(NSUInteger)index {
+    NSLog(@"contentView 滚动到了 %lu", (unsigned long)index);
+    [titleView clickTitleAtIndex:index];
+}
+
+- (void)contentView:(AYPageContentView *)contentView scrollFromIndex:(NSUInteger)fromIndex toIndex:(NSUInteger)toIndex progress:(CGFloat)progress {
+    NSLog(@"contentView 从 index %lu 滚动到了 index %lu, 进度 %f", (unsigned long)fromIndex, (unsigned long)toIndex, progress);
+    [titleView moveFromIndex:fromIndex toIndex:toIndex progress:progress];
+    
 }
 @end

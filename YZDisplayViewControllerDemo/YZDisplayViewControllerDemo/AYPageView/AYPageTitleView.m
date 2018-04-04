@@ -18,6 +18,14 @@
 
 @property (nonatomic, strong) NSMutableArray<UILabel *> *titleLabels;
 
+@property (nonatomic, assign) CGFloat startR;
+@property (nonatomic, assign) CGFloat startG;
+@property (nonatomic, assign) CGFloat startB;
+
+@property (nonatomic, assign) CGFloat endR;
+@property (nonatomic, assign) CGFloat endG;
+@property (nonatomic, assign) CGFloat endB;
+
 @end
 
 @implementation AYPageTitleView
@@ -60,8 +68,8 @@
     _titleViewHeight = 44.0;
     _titleViewBackgroundColor = [UIColor whiteColor];
     
-    _titleColor = [UIColor blackColor];
-    _titleSelectedColor = [UIColor colorWithRed:0.13 green:0.67 blue:0.93 alpha:1.00];
+    self.titleColor = [UIColor blackColor];
+    self.titleSelectedColor = [UIColor colorWithRed:0.13 green:0.67 blue:0.93 alpha:1.00];
     _titleFontSize = 15.0;
     _titleMargin = 20.0;
     
@@ -168,51 +176,7 @@
 #pragma mark - gesture
 - (void)titleClick:(UITapGestureRecognizer *)tap {
     UILabel *targetLabel = (UILabel *)tap.view;
-    if (!targetLabel) {
-        return;
-    }
-    
-    if (targetLabel.tag == _currentIndex) {
-        if ([_delegate respondsToSelector:@selector(titleView:repeatClickAtIndex:)]) {
-            [_delegate titleView:self repeatClickAtIndex:_currentIndex];
-        }
-        return;
-    }
-    
-    UILabel *sourcelabel = self.titleLabels[_currentIndex];
-    sourcelabel.textColor = _titleColor;
-    targetLabel.textColor = _titleSelectedColor;
-    
-    _currentIndex = targetLabel.tag;
-
-    if ([_delegate respondsToSelector:@selector(titleView:clickAtIndex:)]) {
-        [_delegate titleView:self clickAtIndex:_currentIndex];
-    }
-
-    [self centerLabel:targetLabel animated:YES];
-    
-    if (_isTitleScaleEnable) {
-        [UIView animateWithDuration:0.27 animations:^{
-            sourcelabel.transform = CGAffineTransformIdentity;
-            targetLabel.transform = CGAffineTransformMakeScale(_maximumScaleFactor, _maximumScaleFactor);
-        }];
-    }
-    
-    if (_isShowLineView) {
-        [UIView animateWithDuration:0.27 animations:^{
-            self.lineView.yz_width = _lineViewWidth > 0 ? _lineViewWidth :  targetLabel.yz_width;
-            self.lineView.yz_centerX = targetLabel.yz_centerX;
-        }];
-    }
-    
-    if (_isShowCoverView) {
-        CGFloat coverX = _isTitleViewScrollEnable ? (targetLabel.yz_x - _coverMargin) : targetLabel.yz_x;
-        CGFloat coverW = _isTitleViewScrollEnable ? (targetLabel.yz_width + _coverMargin * 2) : targetLabel.yz_width;
-        [UIView animateWithDuration:0.27 animations:^{
-            self.coverView.yz_x = coverX;
-            self.coverView.yz_width = coverW;
-        }];
-    }
+    [self updateTitle:targetLabel isRespondsDelegate:YES];
 }
 
 - (void)centerLabel:(UILabel *)label animated:(BOOL)animated {
@@ -237,6 +201,58 @@
     }
     
     [self.scrollView setContentOffset:CGPointMake(offsetX, 0) animated:animated];
+}
+
+- (void)updateTitle:(UILabel *)label isRespondsDelegate:(BOOL)flag {
+    if (!label) {
+        return;
+    }
+    
+    if (label.tag == _currentIndex) {
+        if (flag) {
+            if ([_delegate respondsToSelector:@selector(titleView:repeatClickAtIndex:)]) {
+                [_delegate titleView:self repeatClickAtIndex:_currentIndex];
+            }
+        }
+        return;
+    }
+    
+    UILabel *sourcelabel = self.titleLabels[_currentIndex];
+    sourcelabel.textColor = _titleColor;
+    label.textColor = _titleSelectedColor;
+    
+    _currentIndex = label.tag;
+    
+    if (flag) {
+        if ([_delegate respondsToSelector:@selector(titleView:clickAtIndex:)]) {
+            [_delegate titleView:self clickAtIndex:_currentIndex];
+        }
+    }
+    
+    [self centerLabel:label animated:YES];
+    
+    if (_isTitleScaleEnable) {
+        [UIView animateWithDuration:0.27 animations:^{
+            sourcelabel.transform = CGAffineTransformIdentity;
+            label.transform = CGAffineTransformMakeScale(_maximumScaleFactor, _maximumScaleFactor);
+        }];
+    }
+    
+    if (_isShowLineView) {
+        [UIView animateWithDuration:0.27 animations:^{
+            self.lineView.yz_width = _lineViewWidth > 0 ? _lineViewWidth : label.yz_width;
+            self.lineView.yz_centerX = label.yz_centerX;
+        }];
+    }
+    
+    if (_isShowCoverView) {
+        CGFloat coverW = _isTitleViewScrollEnable ? (label.yz_width + _coverMargin * 2) : label.yz_width;
+        CGFloat coverX = _isTitleViewScrollEnable ? (label.yz_x - _coverMargin) : label.yz_x;
+        [UIView animateWithDuration:0.27 animations:^{
+            self.coverView.yz_x = coverX;
+            self.coverView.yz_width = coverW;
+        }];
+    }
 }
 
 #pragma mark - layout
@@ -342,6 +358,16 @@
     _currentIndex = currentIndex;
 }
 
+- (void)setTitleColor:(UIColor *)titleColor {
+    _titleColor = titleColor;
+    [_titleColor getRed:&_startR green:&_startG blue:&_startB alpha:nil];
+}
+
+- (void)setTitleSelectedColor:(UIColor *)titleSelectedColor {
+    _titleSelectedColor = titleSelectedColor;
+    [_titleSelectedColor getRed:&_endR green:&_endG blue:&_endB alpha:nil];
+}
+
 #pragma mark - public
 - (void)clickTitleAtIndex:(NSUInteger)index {
     if (index + 1 > self.titleLabels.count) {
@@ -349,7 +375,60 @@
     }
     
     UILabel *targetLabel = self.titleLabels[index];
-    [self titleClick:targetLabel.gestureRecognizers.firstObject];
+    [self updateTitle:targetLabel isRespondsDelegate:NO];
+}
+
+- (void)moveFromIndex:(NSUInteger)fromIndex toIndex:(NSUInteger)toIndex progress:(CGFloat)progress {
+    if (fromIndex + 1 > self.titleLabels.count) {
+        return;
+    }
+    if (toIndex + 1 > self.titleLabels.count) {
+        return;
+    }
+    
+    UILabel *fromLabel = self.titleLabels[fromIndex];
+    UILabel *toLabel = self.titleLabels[toIndex];
+    
+    UILabel *currentLabel = self.titleLabels[_currentIndex];
+    
+    CGFloat deltaR = _endR - _startR;
+    CGFloat deltaG = _endG - _startG;
+    CGFloat deltaB = _endB - _startB;
+    
+    fromLabel.textColor = [UIColor colorWithRed:_endR - progress * deltaR green:_endG - progress * deltaG blue:_endB - progress * deltaB alpha:1];
+    toLabel.textColor = [UIColor colorWithRed:_startR + progress * deltaR green:_startG + progress * deltaG blue:_startB + progress * deltaB alpha:1];
+    currentLabel.textColor = _titleColor;
+    
+    if (_isTitleScaleEnable) {
+        CGFloat deltaScale = _maximumScaleFactor - 1.0;
+        fromLabel.transform = CGAffineTransformMakeScale(_maximumScaleFactor - progress * deltaScale, _maximumScaleFactor - progress * deltaScale);
+        toLabel.transform = CGAffineTransformMakeScale(1.0 + progress * deltaScale, 1.0 + progress * deltaScale);
+        currentLabel.transform = CGAffineTransformIdentity;
+    }
+    
+    if (_isShowLineView) {
+        if (_lineViewWidth == 0.0) {
+            CGFloat deltaW = toLabel.yz_width - fromLabel.yz_width;
+            self.lineView.yz_width = fromLabel.yz_width + progress * deltaW;
+        }
+        
+        CGFloat deltaX = toLabel.yz_centerX - fromLabel.yz_centerX;
+        self.lineView.yz_centerX = fromLabel.yz_centerX + progress * deltaX;
+    }
+    
+    if (_isShowCoverView) {
+        CGFloat deltaW = toLabel.yz_width - fromLabel.yz_width;
+        CGFloat deltaX = toLabel.yz_centerX - fromLabel.yz_centerX;
+        
+        self.coverView.yz_width = _isTitleViewScrollEnable ? (fromLabel.yz_width + 2 * _coverMargin + deltaW * progress) : (fromLabel.yz_width + deltaW * progress);
+        self.coverView.yz_centerX = fromLabel.yz_centerX + progress * deltaX;
+    }
+    
+    _currentIndex = toIndex;
+    
+//    if (progress > 0.98) {  //移动中也居中
+//        [self centerLabel:toLabel animated:YES];
+//    }
 }
 
 - (void)reload {

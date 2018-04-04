@@ -582,6 +582,10 @@ static NSString * const CellIndentifier = @"CellIndentifier";
         return;
     }
     
+    if (!_isShowUnderLine) {
+        return;
+    }
+    
     CGFloat deltaX = targetLabel.frame.origin.x - sourceLabel.frame.origin.x;
     CGFloat deltaW = targetLabel.frame.size.width - sourceLabel.frame.size.width;
     self.underLine.yz_x = sourceLabel.frame.origin.x + progress * deltaX;
@@ -590,6 +594,10 @@ static NSString * const CellIndentifier = @"CellIndentifier";
 
 - (void)updateCoverWithSourceLabel:(UILabel *)sourceLabel targetLabel:(UILabel *)targetLabel progress:(CGFloat)progress {
     if (_isClickTitle) {
+        return;
+    }
+    
+    if (!_isShowTitleCover) {
         return;
     }
     

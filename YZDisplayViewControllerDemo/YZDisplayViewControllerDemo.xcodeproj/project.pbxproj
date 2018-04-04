@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		EB1F1279207476AC00FB0315 /* AYPageContentView.m in Sources */ = {isa = PBXBuildFile; fileRef = EB1F1278207476AC00FB0315 /* AYPageContentView.m */; };
+		EB1F127B2074836900FB0315 /* AYPageTitleView.xib in Resources */ = {isa = PBXBuildFile; fileRef = EB1F127A2074836900FB0315 /* AYPageTitleView.xib */; };
 		EB6BA434207218060099D2FB /* AYPageTitleView.m in Sources */ = {isa = PBXBuildFile; fileRef = EB6BA433207218060099D2FB /* AYPageTitleView.m */; };
 		EB6BA437207236DD0099D2FB /* AYPageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EB6BA436207236DD0099D2FB /* AYPageViewController.m */; };
 		EC0169BD1C2EB399009616E9 /* YZMainTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EC0169BC1C2EB399009616E9 /* YZMainTableViewController.m */; };
@@ -47,6 +49,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		EB1F1277207476AC00FB0315 /* AYPageContentView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AYPageContentView.h; sourceTree = "<group>"; };
+		EB1F1278207476AC00FB0315 /* AYPageContentView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AYPageContentView.m; sourceTree = "<group>"; };
+		EB1F127A2074836900FB0315 /* AYPageTitleView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AYPageTitleView.xib; sourceTree = "<group>"; };
 		EB6BA432207218060099D2FB /* AYPageTitleView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AYPageTitleView.h; sourceTree = "<group>"; };
 		EB6BA433207218060099D2FB /* AYPageTitleView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AYPageTitleView.m; sourceTree = "<group>"; };
 		EB6BA435207236DD0099D2FB /* AYPageViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AYPageViewController.h; sourceTree = "<group>"; };
@@ -120,6 +125,8 @@
 			children = (
 				EB6BA432207218060099D2FB /* AYPageTitleView.h */,
 				EB6BA433207218060099D2FB /* AYPageTitleView.m */,
+				EB1F1277207476AC00FB0315 /* AYPageContentView.h */,
+				EB1F1278207476AC00FB0315 /* AYPageContentView.m */,
 			);
 			path = AYPageView;
 			sourceTree = "<group>";
@@ -131,6 +138,7 @@
 				EC0169BC1C2EB399009616E9 /* YZMainTableViewController.m */,
 				EB6BA435207236DD0099D2FB /* AYPageViewController.h */,
 				EB6BA436207236DD0099D2FB /* AYPageViewController.m */,
+				EB1F127A2074836900FB0315 /* AYPageTitleView.xib */,
 			);
 			path = Main;
 			sourceTree = "<group>";
@@ -370,6 +378,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EB1F127B2074836900FB0315 /* AYPageTitleView.xib in Resources */,
 				EC01A8921C12883C00F91F25 /* LaunchScreen.storyboard in Resources */,
 				EC01A88F1C12883C00F91F25 /* Assets.xcassets in Resources */,
 				EC01A88D1C12883C00F91F25 /* Main.storyboard in Resources */,
@@ -408,6 +417,7 @@
 				ECE168521D44899D00AFC3A0 /* YZDisplayViewController.m in Sources */,
 				EC0169BD1C2EB399009616E9 /* YZMainTableViewController.m in Sources */,
 				ECE168511D44899D00AFC3A0 /* YZDisplayTitleLabel.m in Sources */,
+				EB1F1279207476AC00FB0315 /* AYPageContentView.m in Sources */,
 				EB6BA434207218060099D2FB /* AYPageTitleView.m in Sources */,
 				EC01A8841C12883C00F91F25 /* main.m in Sources */,
 				EC6268871C128A0A000FB840 /* YZJRViewController.m in Sources */,

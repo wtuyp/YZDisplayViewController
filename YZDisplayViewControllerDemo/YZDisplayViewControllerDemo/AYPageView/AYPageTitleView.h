@@ -50,7 +50,9 @@ IB_DESIGNABLE
 - (instancetype)initWithFrame:(CGRect)frame titles:(NSArray *)titles;
 - (instancetype)initWithFrame:(CGRect)frame titles:(NSArray *)titles currentIndex:(NSUInteger)currentIndex;
 
-- (void)clickTitleAtIndex:(NSUInteger)index;
 - (void)reload;
+
+- (void)clickTitleAtIndex:(NSUInteger)index;
+- (void)moveFromIndex:(NSUInteger)fromIndex toIndex:(NSUInteger)toIndex progress:(CGFloat)progress;
 
 @end
