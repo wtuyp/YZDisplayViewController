@@ -22,43 +22,60 @@
 
 @implementation AYPageTitleView
 
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        [self initParams];
+    }
+    return self;
+}
+- (instancetype)initWithFrame:(CGRect)frame titles:(NSArray *)titles {
+    return [self initWithFrame:frame titles:titles currentIndex:0];
+}
+
 - (instancetype)initWithFrame:(CGRect)frame titles:(NSArray *)titles currentIndex:(NSUInteger)currentIndex {
     self = [super initWithFrame:frame];
     if (self) {
+        [self initParams];
         _titles = titles;
-        _currentIndex = (currentIndex > _titles.count - 1 ? _titles.count - 1 : currentIndex);
         
-        _isTitleViewScrollEnable = YES;
-        
-        _titleViewHeight = 44.0;
-        _titleViewBackgroundColor = [UIColor whiteColor];
-        
-        _titleColor = [UIColor blackColor];
-        _titleSelectedColor = [UIColor colorWithRed:0.13 green:0.67 blue:0.93 alpha:1.00];
-        
-        _titleFontSize = 15.0;
-        _titleMargin = 20.0;
-        
-        _maximumScaleFactor = 1.2;
-        
-        _lineViewHeight = 3;
-        
-        _coverMargin = 6;
-        _coverViewHeight = 26;
-        _coverViewRadius = 13;
+        self.currentIndex = currentIndex;
     }
     return self;
 }
 
+- (void)initParams {
+    _isTitleViewScrollEnable = YES;
+    
+    _currentIndex = 0;
+    
+    _titleViewHeight = 44.0;
+    _titleViewBackgroundColor = [UIColor whiteColor];
+    
+    _titleColor = [UIColor blackColor];
+    _titleSelectedColor = [UIColor colorWithRed:0.13 green:0.67 blue:0.93 alpha:1.00];
+    _titleFontSize = 15.0;
+    _titleMargin = 20.0;
+    
+    _maximumScaleFactor = 1.2;
+    
+    _lineViewHeight = 3;
+    _lineViewWidth = 0;
+    
+    _coverMargin = 6;
+    _coverViewHeight = 26;
+    _coverViewRadius = 13;
+}
+
 - (void)willMoveToSuperview:(UIView *)newSuperview {
     [self setUpUI];
-    
 }
 
 - (void)layoutSubviews {
     [super layoutSubviews];
     
     self.scrollView.frame = self.bounds;
+    self.scrollView.backgroundColor = _titleViewBackgroundColor;
     
     [self setUpLabelsLayout];
     [self setUpLineViewLayout];
@@ -72,7 +89,6 @@
         _scrollView = [[UIScrollView alloc] init];
         _scrollView.scrollsToTop = NO;
         _scrollView.showsHorizontalScrollIndicator = NO;
-        _scrollView.backgroundColor = _titleViewBackgroundColor;
     }
     return _scrollView;
 }
@@ -80,9 +96,6 @@
 - (UIView *)coverView {
     if (!_coverView) {
         _coverView = [[UIView alloc] init];
-        
-        _coverView.backgroundColor = _coverViewColor ?: [UIColor lightGrayColor];
-        _coverView.layer.cornerRadius = _coverViewRadius;
     }
     return _coverView;
 }
@@ -90,7 +103,6 @@
 - (UIView *)lineView {
     if (!_lineView) {
         _lineView = [[UIView alloc] init];
-        _lineView.backgroundColor = _lineViewColor ?: _titleSelectedColor;
     }
     return _lineView;
 }
@@ -102,32 +114,30 @@
     return _titleLabels;
 }
 
+- (void)setUpUI {
+    [self addSubview:self.scrollView];
+    
+    [self.scrollView.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
+    [self.titleLabels removeAllObjects];
+    
+    [self setUpTitleLabels];
+    [self setUpLineView];
+    [self setUpCoverView];
+}
+
 - (void)setUpTitleLabels {
     for (NSInteger i = 0; i < _titles.count; i++) {
         UILabel *label = [[UILabel alloc] init];
         label.tag = i;
-        label.text = _titles[i];
         label.textAlignment = NSTextAlignmentCenter;
-        label.textColor = (i == _currentIndex ? _titleSelectedColor : _titleColor);
-        label.font = [UIFont systemFontOfSize:_titleFontSize];
         
         [self.scrollView addSubview:label];
-        
         [self.titleLabels addObject:label];
         
         UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(titleClick:)];
         [label addGestureRecognizer:tap];
         label.userInteractionEnabled = YES;
     }
-    
-}
-
-- (void)setUpUI {
-    [self addSubview:self.scrollView];
-    
-    [self setUpTitleLabels];
-    [self setUpLineView];
-    [self setUpCoverView];
 }
 
 - (void)setUpLineView {
@@ -166,12 +176,12 @@
     targetLabel.textColor = _titleSelectedColor;
     
     _currentIndex = targetLabel.tag;
-    
-    [self centerLabel:targetLabel animated:YES];
-    
+
     if ([_delegate respondsToSelector:@selector(titleView:clickAtIndex:)]) {
         [_delegate titleView:self clickAtIndex:_currentIndex];
     }
+
+    [self centerLabel:targetLabel animated:YES];
     
     if (_isScaleEnable) {
         [UIView animateWithDuration:0.27 animations:^{
@@ -182,8 +192,8 @@
     
     if (_isShowLineView) {
         [UIView animateWithDuration:0.27 animations:^{
-            self.lineView.yz_x = targetLabel.yz_x;
-            self.lineView.yz_width = targetLabel.yz_width;
+            self.lineView.yz_width = _lineViewWidth > 0 ? _lineViewWidth :  targetLabel.yz_width;
+            self.lineView.yz_centerX = targetLabel.yz_centerX;
         }];
     }
     
@@ -195,7 +205,6 @@
             self.coverView.yz_width = coverW;
         }];
     }
-    
 }
 
 - (void)centerLabel:(UILabel *)label animated:(BOOL)animated {
@@ -232,7 +241,9 @@
         
         if (_isTitleViewScrollEnable) {
             NSString *title = self.titles[i];
-
+            label.text = _titles[i];
+            label.textColor = (i == _currentIndex ? _titleSelectedColor : _titleColor);
+            label.font = [UIFont systemFontOfSize:_titleFontSize];
             labelW = [title boundingRectWithSize:CGSizeMake(MAXFLOAT, 0)
                                          options:NSStringDrawingUsesLineFragmentOrigin
                                       attributes:@{NSFontAttributeName : label.font} context:nil].size.width;
@@ -244,15 +255,21 @@
         label.frame = CGRectMake(labelX, 0.0, labelW, self.frame.size.height);
     }
     
+    if (_isTitleViewScrollEnable) {
+        UILabel *lastLabel = self.titleLabels.lastObject;
+        self.scrollView.contentSize = CGSizeMake(CGRectGetMaxX(lastLabel.frame) + _titleMargin * 0.5, self.scrollView.frame.size.height);
+    }
+
+    if (_currentIndex  + 1 > self.titleLabels.count) {
+        return;
+    }
+    
     UILabel *label = self.titleLabels[_currentIndex];
     if (_isScaleEnable) {
         label.transform = CGAffineTransformMakeScale(_maximumScaleFactor, _maximumScaleFactor);
     }
 
     if (_isTitleViewScrollEnable) {
-        UILabel *lastLabel = self.titleLabels.lastObject;
-        self.scrollView.contentSize = CGSizeMake(CGRectGetMaxX(lastLabel.frame) + _titleMargin * 0.5, self.scrollView.frame.size.height);
-        
         if (_currentIndex > 0) {
             [self centerLabel:label animated:NO];
         }
@@ -260,20 +277,22 @@
 }
 
 - (void)setUpLineViewLayout {
-    if (_currentIndex > self.titleLabels.count - 1) {
+    if (_currentIndex  + 1 > self.titleLabels.count) {
         return;
     }
     
     UILabel *label = self.titleLabels[_currentIndex];
     
-    self.lineView.yz_x = label.yz_x;
-    self.lineView.yz_width = label.yz_width;
+    self.lineView.yz_width = _lineViewWidth > 0 ? _lineViewWidth : label.yz_width;
+    self.lineView.yz_centerX = label.yz_centerX;
     self.lineView.yz_height = _lineViewHeight;
     self.lineView.yz_y = self.bounds.size.height - self.lineView.yz_height;
+    
+    self.lineView.backgroundColor = _lineViewColor ?: _titleSelectedColor;
 }
 
 - (void)setUpCoverViewLayout {
-    if (_currentIndex > self.titleLabels.count - 1) {
+    if (_currentIndex  + 1 > self.titleLabels.count) {
         return;
     }
     
@@ -289,6 +308,49 @@
     }
     
     self.coverView.frame = CGRectMake(coverX, coverY, coverW, _coverViewHeight);
+    self.coverView.backgroundColor = _coverViewColor ?: [UIColor lightGrayColor];
+    self.coverView.layer.cornerRadius = _coverViewRadius;
+}
+
+#pragma mark - setter
+- (void)setTitles:(NSArray<NSString *> *)titles {
+    _titles = titles;
+    self.currentIndex = _currentIndex;
+}
+
+- (void)setCurrentIndex:(NSUInteger)currentIndex {
+    if (self.titles.count == 0) {
+        _currentIndex = 0;
+        return;
+    }
+    
+    if (currentIndex + 1 > self.titles.count) {
+        _currentIndex = self.titles.count - 1;
+        return;
+    }
+    
+    _currentIndex = currentIndex;
+}
+
+#pragma mark - public
+- (void)clickTitleAtIndex:(NSUInteger)index {
+    if (index + 1 > self.titleLabels.count) {
+        return;
+    }
+    
+    UILabel *targetLabel = self.titleLabels[index];
+    [self titleClick:targetLabel.gestureRecognizers.firstObject];
+}
+
+- (void)reload {
+    [self.scrollView.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
+    [self.titleLabels removeAllObjects];
+    
+    [self setUpTitleLabels];
+    [self setUpLineView];
+    [self setUpCoverView];
+    
+    [self setNeedsLayout];
 }
 
 @end

@@ -36,6 +36,8 @@
 @property (nonatomic, assign) BOOL isShowLineView;
 @property (nonatomic, strong) UIColor *lineViewColor;
 @property (nonatomic, assign) CGFloat lineViewHeight;
+@property (nonatomic, assign) CGFloat lineViewWidth;
+
 
 @property (nonatomic, assign) BOOL isScaleEnable;
 @property (nonatomic, assign) CGFloat maximumScaleFactor;
@@ -46,6 +48,10 @@
 @property (nonatomic, assign) CGFloat coverViewHeight;
 @property (nonatomic, assign) CGFloat coverViewRadius;
 
+- (instancetype)initWithFrame:(CGRect)frame titles:(NSArray *)titles;
 - (instancetype)initWithFrame:(CGRect)frame titles:(NSArray *)titles currentIndex:(NSUInteger)currentIndex;
+
+- (void)clickTitleAtIndex:(NSUInteger)index;
+- (void)reload;
 
 @end
