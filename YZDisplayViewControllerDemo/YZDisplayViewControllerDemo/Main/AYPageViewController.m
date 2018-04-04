@@ -29,36 +29,42 @@
     titleView.titles = @[@"标题一", @"标题一二", @"标题一二三", @"标题一二三四", @"标题a", @"标题b", @"标题c", @"标题d", @"标题e", @"标题f"];
     titleView.frame = CGRectMake(0, 100, self.view.yz_width, 44);
     titleView.titleViewBackgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.2];
-    
+
     titleView.currentIndex = 8;
-    
+
 //    titleView.isTitleViewScrollEnable = NO;
-    
+
     titleView.isShowLineView = YES;
 //    titleView.lineViewColor = [UIColor yellowColor];
 //    titleView.lineViewWidth = 30;
-    
+
 //    titleView.isShowCoverView = YES;
 //    titleView.coverViewColor = [UIColor yellowColor];
 //    titleView.coverViewHeight = 40;
 //    titleView.coverViewRadius = 0;
-    
-//    titleView.isScaleEnable = YES;
+
+//    titleView.isTitleScaleEnable = YES;
 //    titleView.maximumScaleFactor = 1.5;
-    
+
     titleView.delegate = (id<AYPageTitleViewDelegate>)self;
-    
+
     [self.view addSubview:titleView];
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
 //        titleView.titles = @[@"标题一", @"标题一二", @"标题一二三", @"标题一二三四", @"标题a", @"标题b"];
-//        [titleView reload];
         
 //        titleView.lineViewColor = [UIColor yellowColor];
 //        [titleView setNeedsLayout];
         
 //        [titleView clickTitleAtIndex:2];
     });
+    
+    //xib way
+    UINib *nib = [UINib nibWithNibName:@"AYPageTitleView" bundle:nil];
+    AYPageTitleView *titleView1 = [nib instantiateWithOwner:self options:nil].firstObject;
+    [self.view addSubview:titleView1];
+    titleView1.center = self.view.center;
+    titleView1.titles = @[@"标题一", @"标题一二", @"标题一二三", @"标题一二三四", @"标题a", @"标题b"];
 }
 
 - (void)didReceiveMemoryWarning {

@@ -16,37 +16,36 @@
 
 @end
 
-
+IB_DESIGNABLE
 @interface AYPageTitleView : UIView
 
 @property (nonatomic, weak) id<AYPageTitleViewDelegate> delegate;
-@property (nonatomic, assign) NSUInteger currentIndex;
+@property (nonatomic, assign) IBInspectable NSUInteger currentIndex;  //default 0
 @property (nonatomic, strong) NSArray<NSString *> *titles;
 @property (nonatomic, readonly) NSMutableArray<UILabel *> *titleLabels;
 
-@property (nonatomic, assign) BOOL isTitleViewScrollEnable; //default YES
-@property (nonatomic, assign) CGFloat titleViewHeight;
-@property (nonatomic, strong) UIColor *titleViewBackgroundColor;
+@property (nonatomic, assign) IBInspectable BOOL isTitleViewScrollEnable; //default YES
+@property (nonatomic, assign) IBInspectable CGFloat titleViewHeight;  //default 44.0
+@property (nonatomic, strong) IBInspectable UIColor *titleViewBackgroundColor;    //default whiteColor
 
-@property (nonatomic, strong) UIColor *titleColor;
-@property (nonatomic, strong) UIColor *titleSelectedColor;
-@property (nonatomic, assign) CGFloat titleFontSize;
-@property (nonatomic, assign) CGFloat titleMargin;
+@property (nonatomic, strong) IBInspectable UIColor *titleColor;  //default blackColor
+@property (nonatomic, strong) IBInspectable UIColor *titleSelectedColor;  //default rgb 0.13 0.67 0.93
+@property (nonatomic, assign) IBInspectable CGFloat titleFontSize;    //default 15.0
+@property (nonatomic, assign) IBInspectable CGFloat titleMargin;  //default 20.0
 
-@property (nonatomic, assign) BOOL isShowLineView;
-@property (nonatomic, strong) UIColor *lineViewColor;
-@property (nonatomic, assign) CGFloat lineViewHeight;
-@property (nonatomic, assign) CGFloat lineViewWidth;
+@property (nonatomic, assign) IBInspectable BOOL isTitleScaleEnable;
+@property (nonatomic, assign) IBInspectable CGFloat maximumScaleFactor;   //default 1.2
 
+@property (nonatomic, assign) IBInspectable BOOL isShowLineView;
+@property (nonatomic, strong) IBInspectable UIColor *lineViewColor;   //default same to titleSelectedColor
+@property (nonatomic, assign) IBInspectable CGFloat lineViewHeight;   //default 3.0
+@property (nonatomic, assign) IBInspectable CGFloat lineViewWidth;    //default 0, that line width is equal to title width
 
-@property (nonatomic, assign) BOOL isScaleEnable;
-@property (nonatomic, assign) CGFloat maximumScaleFactor;
-
-@property (nonatomic, assign) BOOL isShowCoverView;
-@property (nonatomic, strong) UIColor *coverViewColor;
-@property (nonatomic, assign) CGFloat coverMargin;
-@property (nonatomic, assign) CGFloat coverViewHeight;
-@property (nonatomic, assign) CGFloat coverViewRadius;
+@property (nonatomic, assign) IBInspectable BOOL isShowCoverView;
+@property (nonatomic, strong) IBInspectable UIColor *coverViewColor;  //default lightGrayColor
+@property (nonatomic, assign) IBInspectable CGFloat coverMargin;  //default 6.0
+@property (nonatomic, assign) IBInspectable CGFloat coverViewHeight;  //default 26.0
+@property (nonatomic, assign) IBInspectable CGFloat coverViewRadius;  //default 13.0
 
 - (instancetype)initWithFrame:(CGRect)frame titles:(NSArray *)titles;
 - (instancetype)initWithFrame:(CGRect)frame titles:(NSArray *)titles currentIndex:(NSUInteger)currentIndex;

@@ -22,6 +22,14 @@
 
 @implementation AYPageTitleView
 
+- (instancetype)initWithCoder:(NSCoder *)coder {
+    self = [super initWithCoder:coder];
+    if (self) {
+        [self initParams];
+    }
+    return self;
+}
+
 - (instancetype)init {
     self = [super init];
     if (self) {
@@ -59,12 +67,12 @@
     
     _maximumScaleFactor = 1.2;
     
-    _lineViewHeight = 3;
+    _lineViewHeight = 3.0;
     _lineViewWidth = 0;
     
-    _coverMargin = 6;
-    _coverViewHeight = 26;
-    _coverViewRadius = 13;
+    _coverMargin = 6.0;
+    _coverViewHeight = 26.0;
+    _coverViewRadius = 13.0;
 }
 
 - (void)willMoveToSuperview:(UIView *)newSuperview {
@@ -183,7 +191,7 @@
 
     [self centerLabel:targetLabel animated:YES];
     
-    if (_isScaleEnable) {
+    if (_isTitleScaleEnable) {
         [UIView animateWithDuration:0.27 animations:^{
             sourcelabel.transform = CGAffineTransformIdentity;
             targetLabel.transform = CGAffineTransformMakeScale(_maximumScaleFactor, _maximumScaleFactor);
@@ -265,7 +273,7 @@
     }
     
     UILabel *label = self.titleLabels[_currentIndex];
-    if (_isScaleEnable) {
+    if (_isTitleScaleEnable) {
         label.transform = CGAffineTransformMakeScale(_maximumScaleFactor, _maximumScaleFactor);
     }
 
@@ -316,6 +324,8 @@
 - (void)setTitles:(NSArray<NSString *> *)titles {
     _titles = titles;
     self.currentIndex = _currentIndex;
+    
+    [self reload];
 }
 
 - (void)setCurrentIndex:(NSUInteger)currentIndex {
