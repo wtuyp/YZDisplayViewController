@@ -76,7 +76,7 @@
     
     _maximumScaleFactor = 1.2;
     
-    _lineViewHeight = 3.0;
+    _lineViewHeight = 2.0;
     _lineViewWidth = 0;
     
     _coverMargin = 6.0;

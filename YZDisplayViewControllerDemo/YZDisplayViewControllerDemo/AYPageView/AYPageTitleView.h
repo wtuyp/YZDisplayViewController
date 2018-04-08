@@ -38,7 +38,7 @@ IB_DESIGNABLE
 
 @property (nonatomic, assign) IBInspectable BOOL isShowLineView;
 @property (nonatomic, strong) IBInspectable UIColor *lineViewColor;   //default same to titleSelectedColor
-@property (nonatomic, assign) IBInspectable CGFloat lineViewHeight;   //default 3.0
+@property (nonatomic, assign) IBInspectable CGFloat lineViewHeight;   //default 2.0
 @property (nonatomic, assign) IBInspectable CGFloat lineViewWidth;    //default 0, that line width is equal to title width
 
 @property (nonatomic, assign) IBInspectable BOOL isShowCoverView;
