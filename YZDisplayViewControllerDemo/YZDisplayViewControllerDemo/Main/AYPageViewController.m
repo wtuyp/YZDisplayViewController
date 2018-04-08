@@ -74,7 +74,11 @@
     titleView1.center = self.view.center;
     titleView1.titles = @[@"标题一", @"标题一二", @"标题一二三", @"标题一二三四", @"标题a", @"标题b"];
     
-    contentView = [[AYPageContentView alloc] initWithFrame:CGRectMake(10, CGRectGetMaxY(titleView.frame) + 5, self.view.yz_width - 20, CGRectGetMinY(titleView1.frame) - CGRectGetMaxY(titleView.frame) - 10) childViewControllers:[self childVCs] currentIndex:0];
+//    contentView = [[AYPageContentView alloc] initWithFrame:CGRectMake(10, CGRectGetMaxY(titleView.frame) + 5, self.view.yz_width - 20, CGRectGetMinY(titleView1.frame) - CGRectGetMaxY(titleView.frame) - 10) childViewControllers:[self childVCs] currentIndex:0];
+    
+    contentView = [[AYPageContentView alloc] init];
+    contentView.frame = CGRectMake(10, CGRectGetMaxY(titleView.frame) + 5, self.view.yz_width - 20, CGRectGetMinY(titleView1.frame) - CGRectGetMaxY(titleView.frame) - 10);
+    contentView.childViewControllers = [self childVCs];
     contentView.delegate = (id<AYPageContentViewDelegate>)self;
     [self.view addSubview:contentView];
 }

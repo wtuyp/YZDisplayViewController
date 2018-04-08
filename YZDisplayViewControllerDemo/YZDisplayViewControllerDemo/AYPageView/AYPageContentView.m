@@ -22,18 +22,40 @@ static NSString * const CellIndentifier = @"CellIndentifier";
 
 @implementation AYPageContentView
 
+- (instancetype)initWithCoder:(NSCoder *)coder {
+    self = [super initWithCoder:coder];
+    if (self) {
+        [self initParams];
+    }
+    return self;
+}
+
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        [self initParams];
+    }
+    return self;
+}
+
+- (instancetype)initWithFrame:(CGRect)frame childViewControllers:(NSArray *)childViewControllers {
+    return [self initWithFrame:frame childViewControllers:childViewControllers currentIndex:0];
+}
+
 - (instancetype)initWithFrame:(CGRect)frame childViewControllers:(NSArray *)childViewControllers currentIndex:(NSUInteger)currentIndex {
     self = [super initWithFrame:frame];
     if (self) {
-//        [self initParams];
-//        _titles = titles;
-        
+        [self initParams];
         
         _childViewControllers = childViewControllers;
         
         self.currentIndex = currentIndex;
     }
     return self;
+}
+
+- (void)initParams {
+    _currentIndex = 0;
 }
 
 - (void)willMoveToSuperview:(UIView *)newSuperview {
@@ -118,7 +140,6 @@ static NSString * const CellIndentifier = @"CellIndentifier";
     CGFloat width = CGRectGetWidth(scrollView.frame);
     NSInteger index = (scrollView.contentOffset.x + width * 0.5) / width;
     
-    
     if (index == _currentIndex) {
         return;
     }
@@ -166,6 +187,27 @@ static NSString * const CellIndentifier = @"CellIndentifier";
     if ([_delegate respondsToSelector:@selector(contentView:scrollFromIndex:toIndex:progress:)]) {
         [_delegate contentView:self scrollFromIndex:fromIndex toIndex:toIndex progress:progress];
     }
+}
+
+#pragma mark - setter
+- (void)setChildViewControllers:(NSArray<UIViewController *> *)childViewControllers {
+    _childViewControllers = childViewControllers;
+    
+    [self.contentScrollView reloadData];
+}
+
+- (void)setCurrentIndex:(NSUInteger)currentIndex {
+    if (self.childViewControllers.count == 0) {
+        _currentIndex = 0;
+        return;
+    }
+    
+    if (currentIndex + 1 > self.childViewControllers.count) {
+        _currentIndex = self.childViewControllers.count - 1;
+        return;
+    }
+    
+    _currentIndex = currentIndex;
 }
 
 #pragma mark - public

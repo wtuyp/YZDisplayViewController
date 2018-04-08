@@ -23,10 +23,7 @@
 @property (nonatomic, assign) NSUInteger currentIndex;  //default 0
 @property (nonatomic, strong) NSArray<UIViewController *> *childViewControllers;
 
-@property (nonatomic, assign) BOOL isTitleViewScrollEnable; //default YES
-@property (nonatomic, assign) CGFloat titleViewHeight;
-@property (nonatomic, strong) UIColor *titleViewBackgroundColor;
-
+- (instancetype)initWithFrame:(CGRect)frame childViewControllers:(NSArray *)childViewControllers;
 - (instancetype)initWithFrame:(CGRect)frame childViewControllers:(NSArray *)childViewControllers currentIndex:(NSUInteger)currentIndex;
 - (void)scrollToIndex:(NSUInteger)index;
 
