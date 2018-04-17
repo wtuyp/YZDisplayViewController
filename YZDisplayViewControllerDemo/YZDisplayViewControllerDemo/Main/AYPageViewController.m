@@ -80,6 +80,10 @@
     _contentView.childViewControllers = [self childVCs];
     _contentView.delegate = (id<AYPageContentViewDelegate>)self;
     [self.view addSubview:_contentView];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [_contentView addChildViewControllers:[self childVCs]];
+    });
 }
 
 - (void)didReceiveMemoryWarning {
@@ -102,14 +106,14 @@
     NSLog(@"titleView 点到我了 = %@", [titleView.titleLabels[index] text]);
     
     [_contentView scrollToIndex:index];
-
 }
+
 - (void)titleView:(AYPageTitleView *)titleView repeatClickAtIndex:(NSUInteger)index {
     NSLog(@"titleView 又点到我了 = %@", [titleView.titleLabels[index] text]);
 }
 
 #pragma mark - AYPageContentViewDelegate
-- (void)contentView:(AYPageContentView *)contentView didSEndScrollAtIndex:(NSUInteger)index {
+- (void)contentView:(AYPageContentView *)contentView didEndScrollAtIndex:(NSUInteger)index {
     NSLog(@"contentView 滚动到了 %lu", (unsigned long)index);
     [_titleView clickTitleAtIndex:index];
 }

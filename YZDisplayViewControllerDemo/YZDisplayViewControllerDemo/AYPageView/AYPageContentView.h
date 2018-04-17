@@ -12,7 +12,7 @@
 @protocol AYPageContentViewDelegate <NSObject>
 
 @optional
-- (void)contentView:(AYPageContentView *)contentView didSEndScrollAtIndex:(NSUInteger)index;
+- (void)contentView:(AYPageContentView *)contentView didEndScrollAtIndex:(NSUInteger)index;
 - (void)contentView:(AYPageContentView *)contentView scrollFromIndex:(NSUInteger)fromIndex toIndex:(NSUInteger)toIndex progress:(CGFloat)progress;
 
 @end
@@ -26,5 +26,6 @@
 - (instancetype)initWithFrame:(CGRect)frame childViewControllers:(NSArray *)childViewControllers;
 - (instancetype)initWithFrame:(CGRect)frame childViewControllers:(NSArray *)childViewControllers currentIndex:(NSUInteger)currentIndex;
 - (void)scrollToIndex:(NSUInteger)index;
+- (void)addChildViewControllers:(NSArray *)childViewControllers;
 
 @end

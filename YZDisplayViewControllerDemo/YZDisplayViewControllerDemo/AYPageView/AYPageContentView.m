@@ -145,8 +145,8 @@ static NSString * const CellIndentifier = @"CellIndentifier";
     }
     _currentIndex = index;
     
-    if ([_delegate respondsToSelector:@selector(contentView:didSEndScrollAtIndex:)]) {
-        [_delegate contentView:self didSEndScrollAtIndex:index];
+    if ([_delegate respondsToSelector:@selector(contentView:didEndScrollAtIndex:)]) {
+        [_delegate contentView:self didEndScrollAtIndex:index];
     }
 }
 
@@ -215,4 +215,26 @@ static NSString * const CellIndentifier = @"CellIndentifier";
     _currentIndex = index;
     self.contentScrollView.contentOffset = CGPointMake(index * self.contentScrollView.yz_width, 0);
 }
+
+- (void)addChildViewControllers:(NSArray *)childViewControllers {
+    if (!childViewControllers || childViewControllers.count == 0) {
+        return;
+    }
+
+    NSMutableArray *indexPaths = [[NSMutableArray alloc] init];
+    for (NSInteger index = 0; index < childViewControllers.count; index++) {
+        [indexPaths addObject:[NSIndexPath indexPathForItem:self.childViewControllers.count + index inSection:0]];
+    }
+    
+    NSMutableArray *child = [[NSMutableArray alloc] initWithArray:self.childViewControllers];
+    [child addObjectsFromArray:childViewControllers];
+    _childViewControllers = [child copy];
+
+    [self.contentScrollView performBatchUpdates:^{
+        [self.contentScrollView insertItemsAtIndexPaths:indexPaths];
+    } completion:^(BOOL finished) {
+        ;
+    }];
+}
+
 @end
