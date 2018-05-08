@@ -120,6 +120,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		EB63430E20A145110036F173 /* AYPageViewController */ = {
+			isa = PBXGroup;
+			children = (
+				EB6BA435207236DD0099D2FB /* AYPageViewController.h */,
+				EB6BA436207236DD0099D2FB /* AYPageViewController.m */,
+				EB1F127A2074836900FB0315 /* AYPageTitleView.xib */,
+			);
+			path = AYPageViewController;
+			sourceTree = "<group>";
+		};
 		EB6BA431207217CA0099D2FB /* AYPageView */ = {
 			isa = PBXGroup;
 			children = (
@@ -136,9 +146,6 @@
 			children = (
 				EC0169BB1C2EB399009616E9 /* YZMainTableViewController.h */,
 				EC0169BC1C2EB399009616E9 /* YZMainTableViewController.m */,
-				EB6BA435207236DD0099D2FB /* AYPageViewController.h */,
-				EB6BA436207236DD0099D2FB /* AYPageViewController.m */,
-				EB1F127A2074836900FB0315 /* AYPageTitleView.xib */,
 			);
 			path = Main;
 			sourceTree = "<group>";
@@ -166,6 +173,7 @@
 		EC01A8811C12883C00F91F25 /* YZDisplayViewControllerDemo */ = {
 			isa = PBXGroup;
 			children = (
+				EB63430E20A145110036F173 /* AYPageViewController */,
 				EB6BA431207217CA0099D2FB /* AYPageView */,
 				ECE168461D44899D00AFC3A0 /* YZDisplayViewController */,
 				EC0169BA1C2EB381009616E9 /* Main */,

@@ -30,8 +30,8 @@
     self.title = @"AYPageViewController";
     self.view.backgroundColor = [UIColor whiteColor];
     
-    
-//    AYPageTitleView *_titleView = [[AYPageTitleView alloc] initWithFrame:CGRectMake(0, 100, self.view.yz_width, 44) titles:@[@"标题一", @"标题一二", @"标题一二三", @"标题一二三四", @"标题a", @"标题b", @"标题c", @"标题d", @"标题e", @"标题f"]];
+    //AYPageTitleView
+//    _titleView = [[AYPageTitleView alloc] initWithFrame:CGRectMake(0, 100, self.view.yz_width, 44) titles:@[@"标题一", @"标题一二", @"标题一二三", @"标题一二三四", @"标题a", @"标题b", @"标题c", @"标题d", @"标题e", @"标题f"]];
     
     _titleView = [[AYPageTitleView alloc] init];
     _titleView.titles = @[@"标题一", @"标题一二", @"标题一二三", @"标题一二三四", @"标题a", @"标题b", @"标题c", @"标题d", @"标题e", @"标题f"];
@@ -57,22 +57,23 @@
 
     [self.view addSubview:_titleView];
     
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-//        _titleView.titles = @[@"标题一", @"标题一二", @"标题一二三", @"标题一二三四", @"标题a", @"标题b"];
-        
-//        _titleView.lineViewColor = [UIColor yellowColor];
-//        [_titleView setNeedsLayout];
-        
-//        [_titleView clickTitleAtIndex:2];
-    });
+//    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+////        _titleView.titles = @[@"标题一", @"标题一二", @"标题一二三", @"标题一二三四", @"标题a", @"标题b"];
+//
+////        _titleView.lineViewColor = [UIColor yellowColor];
+////        [_titleView setNeedsLayout];
+//
+////        [_titleView clickTitleAtIndex:2];
+//    });
     
-    //xib way
+    //AYPageTitleView xib way
     UINib *nib = [UINib nibWithNibName:@"AYPageTitleView" bundle:nil];
     AYPageTitleView *titleView1 = [nib instantiateWithOwner:self options:nil].firstObject;
     [self.view addSubview:titleView1];
     titleView1.center = self.view.center;
     titleView1.titles = @[@"标题一", @"标题一二", @"标题一二三", @"标题一二三四", @"标题a", @"标题b"];
     
+    //AYPageContentView
 //    _contentView = [[AYPageContentView alloc] initWithFrame:CGRectMake(10, CGRectGetMaxY(_titleView.frame) + 5, self.view.yz_width - 20, CGRectGetMinY(titleView1.frame) - CGRectGetMaxY(_titleView.frame) - 10) childViewControllers:[self childVCs] currentIndex:0];
     
     _contentView = [[AYPageContentView alloc] init];
@@ -81,9 +82,9 @@
     _contentView.delegate = (id<AYPageContentViewDelegate>)self;
     [self.view addSubview:_contentView];
     
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [_contentView addChildViewControllers:[self childVCs]];
-    });
+//    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+//        [_contentView addChildViewControllers:[self childVCs]];
+//    });
 }
 
 - (void)didReceiveMemoryWarning {
@@ -123,4 +124,5 @@
     [_titleView moveFromIndex:fromIndex toIndex:toIndex progress:progress];
     
 }
+
 @end

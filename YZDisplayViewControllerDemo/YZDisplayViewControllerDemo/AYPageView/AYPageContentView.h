@@ -25,7 +25,9 @@
 
 - (instancetype)initWithFrame:(CGRect)frame childViewControllers:(NSArray *)childViewControllers;
 - (instancetype)initWithFrame:(CGRect)frame childViewControllers:(NSArray *)childViewControllers currentIndex:(NSUInteger)currentIndex;
+
 - (void)scrollToIndex:(NSUInteger)index;
+
 - (void)addChildViewControllers:(NSArray *)childViewControllers;
 
 @end
